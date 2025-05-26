@@ -23,7 +23,15 @@ params = {
     'currencyCode': 'USD'
 }
 
-def return_results(params):
+def return_results(originLocationCode, destinationLocationCode, departureDate, adults, maxPrice, currencyCode):
+    params = {
+        'originLocationCode': originLocationCode,
+        'destinationLocationCode': destinationLocationCode,
+        'departureDate': departureDate,
+        'adults': adults,
+        'maxPrice': maxPrice,
+        'currencyCode': currencyCode
+    }
     resp = requests.get(
         'https://test.api.amadeus.com/v2/shopping/flight-offers',
         headers=headers,

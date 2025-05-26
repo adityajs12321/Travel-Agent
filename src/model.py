@@ -1,6 +1,8 @@
 from langchain_groq import ChatGroq
 from agentic_patterns.reflection_pattern.reflection_agent import ReflectionAgent
 from agentic_patterns.planning_pattern.react_agent import ReactAgent
+from agentic_patterns.tool_pattern.tool import tool
+from api_calling import return_results
 
 # agent = ReflectionAgent()
 
@@ -20,5 +22,12 @@ from agentic_patterns.planning_pattern.react_agent import ReactAgent
 
 # print(response)
 
+@tool
+def use_api(originLocationCode, destinationLocationCode, departureDate, adults, maxPrice, currencyCode):
+    return_results(originLocationCode, destinationLocationCode, departureDate, adults, maxPrice, currencyCode)
+
+
 agent = ReactAgent()
-response = Reac
+response = agent.run(
+    
+)

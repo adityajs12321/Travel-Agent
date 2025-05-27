@@ -23,11 +23,23 @@ from api_calling import return_results
 # print(response)
 
 @tool
-def use_api(originLocationCode, destinationLocationCode, departureDate, adults, maxPrice, currencyCode):
-    return_results(originLocationCode, destinationLocationCode, departureDate, adults, maxPrice, currencyCode)
+def get_flight_details(originLocationCode: str, destinationLocationCode: str, departureDate: str, adults: str, maxPrice: str, currencyCode: str):
+    """
+    Gets the flight details provided the given details.
+
+    Args:
+        originLocationCode (str): The origin airport code
+        destinationLocationCode (str): The origin airport code
+        departureDate (str): The date of departure (Should be in YYYY-MM-DD format)
+        adults (str): The number of adults
+        maxPrice (str): The max price the flight should cost
+        currencyCode (str): Currency code
+    """
+    print(return_results(originLocationCode, destinationLocationCode, departureDate, adults, maxPrice, currencyCode))
 
 
-agent = ReactAgent()
+agent = ReactAgent(get_flight_details)
 response = agent.run(
-    
+    "i want to book a flight from JFK to Los Angeles on 2025-6-4 for 1 adult. price should not exceed 200 and the currency code is USD",
+    max_rounds=3
 )

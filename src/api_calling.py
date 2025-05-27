@@ -38,7 +38,8 @@ def return_results(originLocationCode, destinationLocationCode, departureDate, a
         params=params
     )
     valid_offers = []
-    desired_destination = "LAX"
+    desired_destination = destinationLocationCode
+    print(resp.json())
     
     for offer in resp.json()['data']:
         segments = offer['itineraries'][0]['segments']
@@ -46,3 +47,5 @@ def return_results(originLocationCode, destinationLocationCode, departureDate, a
         if final_arrival == desired_destination:
             valid_offers.append(offer)
     return valid_offers
+
+# print(return_results(params['originLocationCode'], params['destinationLocationCode'], params['departureDate'], params['adults'], params['maxPrice'], params['currencyCode']))

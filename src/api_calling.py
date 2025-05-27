@@ -6,11 +6,12 @@ auth_resp = requests.post(
     'https://test.api.amadeus.com/v1/security/oauth2/token',
     data={
         'grant_type': 'client_credentials',
-        'client_id': os.getenv('CLIENT_ID'),
-        'client_secret': os.getenv('CLIENT_SECRET'),
+        'client_id': os.environ['AMADEUS_CLIENT_ID'],
+        'client_secret': os.environ['AMADEUS_CLIENT_SECRET'],
     }
 )
-access_token = auth_resp.json()['access_token']
+print(auth_resp.json())
+access_token = os.environ['AMADEUS_ACCESS_TOKEN']
 
 # Step 2: Call Flight Destinations API
 headers = {'Authorization': f'Bearer {access_token}'}
@@ -40,7 +41,7 @@ def return_results(originLocationCode, destinationLocationCode, departureDate, a
     )
     valid_offers = []
     desired_destination = destinationLocationCode
-    print(resp.json())
+    print(resp.status_code)
     
     for offer in resp.json()['data']:
         segments = offer['itineraries'][0]['segments']
@@ -49,4 +50,4 @@ def return_results(originLocationCode, destinationLocationCode, departureDate, a
             valid_offers.append(offer)
     return valid_offers
 
-# print(return_results(params['originLocationCode'], params['destinationLocationCode'], params['departureDate'], params['adults'], params['maxPrice'], params['currencyCode']))
+print(return_results(params['originLocationCode'], params['destinationLocationCode'], params['departureDate'], params['adults'], params['maxPrice'], params['currencyCode']))

@@ -1,9 +1,9 @@
 import json
 import re
 from typing import Union
+import os
 
 from colorama import Fore
-from dotenv import load_dotenv
 from groq import Groq
 
 from agentic_patterns.tool_pattern.tool import Tool
@@ -14,9 +14,11 @@ from agentic_patterns.utils.completions import completions_create
 from agentic_patterns.utils.completions import update_chat_history
 from agentic_patterns.utils.extraction import extract_tag_content
 
-load_dotenv()
 
-BASE_SYSTEM_PROMPT = ""
+BASE_SYSTEM_PROMPT = """
+You are a travel agent that takes user input and calls the flight search tool after extracting relevant information.
+You will then choose the best flight provided by the flights list and provide explanation for it
+"""
 
 
 REACT_SYSTEM_PROMPT = """
@@ -76,7 +78,7 @@ class ReactAgent:
         model: str = "llama-3.3-70b-versatile",
         system_prompt: str = BASE_SYSTEM_PROMPT,
     ) -> None:
-        self.client = Groq(api_key="")
+        self.client = Groq(api_key=os.environ['GROQ_API_KEY'])
         self.model = model
         self.system_prompt = system_prompt
         self.tools = tools if isinstance(tools, list) else [tools]

@@ -3,6 +3,20 @@ from agentic_patterns.planning_pattern.react_agent import ReactAgent
 from agentic_patterns.tool_pattern.tool import tool
 from pydantic import BaseModel, Field
 from AmadeusAPI import AmadeusClient
+import os
+
+CLIENT_ID = os.environ['AMADEUS_CLIENT_ID']
+CLIENT_SECRET = os.environ['AMADEUS_CLIENT_SECRET']
+client = None
+
+try:
+    access_token = os.environ["AMADEUS_ACCESS_TOKEN"]
+    client = AmadeusClient(CLIENT_ID, CLIENT_SECRET, access_token)
+except Exception as e:
+    print("No access token found")
+    client = AmadeusClient(CLIENT_ID, CLIENT_SECRET)
+except Exception as e:
+    print("Client failed to connect")
 
 class TripRequest(BaseModel):
     origin: str = Field(..., description="Departure city/airport code")
@@ -16,16 +30,34 @@ class TravelTools:
     def __init__(self, amadeus_client: AmadeusClient):
         self.amadeus_client = amadeus_client
 
-    def flight_search_tool(self, trip_request: TripRequest):
-        """Tool 1: Available flights search"""
+@tool
+def flight_search_tool(
+    originLocationCode: str,
+    destinationLocationCode: str,
+    departureDate: str,
+    adults: str,
+    maxPrice: str,
+    currencyCode: str = "USD"
+):
+        f"""
+        Gets the flight details provided the given details.
+
+        Args:
+            originLocationCode (str): The origin airport code
+            destinationLocationCode (str): The origin airport code
+            departureDate (str): The date of departure (Should be in YYYY-MM-DD format)
+            adults (str): The number of adults
+            maxPrice (str): The max price the flight should cost
+            currencyCode (str): Currency code
+        """
         try:
-            result = self.amadeus_client.search_flights(
-                trip_request.origin,
-                trip_request.destination,
-                trip_request.departure_date,
-                trip_request.adults,
-                trip_request.maxPrice,
-                trip_request.currencyCode
+            result = client.search_flights(
+                originLocationCode,
+                destinationLocationCode,
+                departureDate,
+                adults,
+                maxPrice,
+                currencyCode
             )
 
             flights = []
@@ -66,6 +98,37 @@ class TravelTools:
         except Exception as e:
             print("No Flights found")
             return []
+tools_list = [flight_search_tool]
+
+
+tools = {
+    'flight_search_tool': flight_search_tool.fn
+}
+print(tools)
 
 class IntelTravelModel:
-    def __init
+    def trip_planning(self, request: TripRequest):
+        """Trip planning using ReAct and Reflection patterns"""
+
+        # flights = tools['flight_search_tool'](
+        #     request
+        # )
+
+        model = ReactAgent(tools_list)
+        response = model.run(
+            user_msg=f"""
+            I want to book a flight from JFK to LAX on 2025-06-04 for 1 adult. price should not 200. 
+            """,
+            max_rounds=3
+        )
+
+        return response
+
+model_agent = IntelTravelModel()
+trip_request = TripRequest(origin="JFK", 
+                           destination="LAX", 
+                           departure_date="2024-06-04", 
+                           adults="1", 
+                           maxPrice="200")
+response = model_agent.trip_planning(trip_request)
+print(response)

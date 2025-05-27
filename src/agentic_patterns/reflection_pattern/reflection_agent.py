@@ -1,5 +1,6 @@
 from colorama import Fore
 from groq import Groq
+import os
 
 from agentic_patterns.utils.completions import build_prompt_structure
 from agentic_patterns.utils.completions import completions_create
@@ -34,7 +35,7 @@ class ReflectionAgent:
     """
 
     def __init__(self, model: str = "llama-3.3-70b-versatile"):
-        self.client = Groq(api_key="")
+        self.client = Groq(api_key=os.environ['GROQ_API_KEY'])
         self.model = model
 
     def _request_completion(

@@ -1,6 +1,8 @@
 import os
+from agentic_patterns.tool_pattern.tool import tool
 
-try :
-    lm = os.environ['ACE']
-except Exception as e:
-    print("nothing found")
+@tool
+def return_results():
+    print("wefwf")
+
+print(return_results.name)

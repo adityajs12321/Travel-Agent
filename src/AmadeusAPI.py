@@ -58,6 +58,17 @@ class AmadeusClient:
         response = requests.get(url, headers=headers, params=params)
         if response.status_code == 200:
             return response.json()
+        elif response.status_code == 401:
+            self.get_access_token()
+            self.search_flights(
+                self,
+                origin,
+                destination,
+                departureDate,
+                adults,
+                maxPrice,
+                currencyCode
+            )
         else:
             raise HTTPException(status_code=500, detail="Flight search failed")
     
@@ -77,16 +88,3 @@ class AmadeusClient:
             return response.json()
         else:
             raise HTTPException(status_code=500, detail="Airport Codes could not be retrieved")
-
-CLIENT_ID = os.getenv('CLIENT_ID')
-CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-client = None
-
-try:
-    access_token = os.environ["AMADEUS_ACCESS_TOKEN"]
-    client = AmadeusClient(CLIENT_ID, CLIENT_SECRET, access_token)
-except Exception as e:
-    client = AmadeusClient(CLIENT_ID, CLIENT_SECRET)
-
-# print(client.get_airport_info("LAX"))
-print(client.search_flights("JFK", "LAX", "2025-06-04", 1, 200))

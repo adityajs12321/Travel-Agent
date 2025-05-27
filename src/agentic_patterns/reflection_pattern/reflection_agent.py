@@ -34,7 +34,7 @@ class ReflectionAgent:
     """
 
     def __init__(self, model: str = "llama-3.3-70b-versatile"):
-        self.client = Groq(api_key="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")
+        self.client = Groq(api_key="")
         self.model = model
 
     def _request_completion(

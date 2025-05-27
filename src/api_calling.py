@@ -1,12 +1,13 @@
 import requests
+import os
 
 # Step 1: Auth
 auth_resp = requests.post(
     'https://test.api.amadeus.com/v1/security/oauth2/token',
     data={
         'grant_type': 'client_credentials',
-        'client_id': 'oejdFFuyHrUNG2JghIAUBtaUphuLicZi',
-        'client_secret': 'w2L5zvfXJeZ3fabV',
+        'client_id': os.getenv('CLIENT_ID'),
+        'client_secret': os.getenv('CLIENT_SECRET'),
     }
 )
 access_token = auth_resp.json()['access_token']

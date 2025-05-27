@@ -1,45 +1,71 @@
-from langchain_groq import ChatGroq
 from agentic_patterns.reflection_pattern.reflection_agent import ReflectionAgent
 from agentic_patterns.planning_pattern.react_agent import ReactAgent
 from agentic_patterns.tool_pattern.tool import tool
-from api_calling import return_results
+from pydantic import BaseModel, Field
+from AmadeusAPI import AmadeusClient
 
-# agent = ReflectionAgent()
+class TripRequest(BaseModel):
+    origin: str = Field(..., description="Departure city/airport code")
+    destination: str = Field(..., description="Destination city/airport code")
+    departure_date: str = Field(..., description="Departure date")
+    adults: str = Field(..., description="Number of passengers")
+    maxPrice: str = Field(..., description="Maximum price of flight")
+    currencyCode: str = Field("USD", description="The currency code")
 
-# generation_system_prompt = """You are a Python Programmer tasked with generating high quality code
-#     Your task is to generate the best possible code for the user. If the user provides critique,
-#     respond with a revised version of the previous code
-# """
+class TravelTools:
+    def __init__(self, amadeus_client: AmadeusClient):
+        self.amadeus_client = amadeus_client
 
-# reflection_system_prompt = """You are an experienced computer scientist, tasked with providing critique and recommendations for the provided code"""
+    def flight_search_tool(self, trip_request: TripRequest):
+        """Tool 1: Available flights search"""
+        try:
+            result = self.amadeus_client.search_flights(
+                trip_request.origin,
+                trip_request.destination,
+                trip_request.departure_date,
+                trip_request.adults,
+                trip_request.maxPrice,
+                trip_request.currencyCode
+            )
 
-# response = agent.run(
-#     user_msg="Generate C code that implements the merge sort algorithm",
-#     generation_system_prompt=generation_system_prompt,
-#     reflection_system_prompt=reflection_system_prompt,
-#     n_steps=3,
-# )
+            flights = []
 
-# print(response)
+            for offer in result.get("data", [])[:5]:
+                flight_info = {
+                    "id": offer['id'],
+                    'price': offer['price']['total'],
+                    'currency': offer['price']['currency'],
+                    'itineraries': []
+                }
 
-@tool
-def get_flight_details(originLocationCode: str, destinationLocationCode: str, departureDate: str, adults: str, maxPrice: str, currencyCode: str):
-    """
-    Gets the flight details provided the given details.
+                for itinerary in offer['itineraries']:
+                    itinerary_info = {
+                        'duration': itinerary['duration'],
+                        'segments': []
+                    }
 
-    Args:
-        originLocationCode (str): The origin airport code
-        destinationLocationCode (str): The origin airport code
-        departureDate (str): The date of departure (Should be in YYYY-MM-DD format)
-        adults (str): The number of adults
-        maxPrice (str): The max price the flight should cost
-        currencyCode (str): Currency code
-    """
-    print(return_results(originLocationCode, destinationLocationCode, departureDate, adults, maxPrice, currencyCode))
+                    for segment in itinerary['segments']:
+                        segment_info = {
+                            'departure': {
+                                'airport': segment['departure']['iataCode'],
+                                'time': segment['departure']['at']
+                            },
+                            'arrival': {
+                                'airport': segment['arrival']['iataCode'],
+                                'time': segment['arrival']['at']
+                            },
+                            'airline': segment['carrierCode'],
+                            'flight_number': segment['number']
+                        }
+                        itinerary_info['segments'].append(segment_info)
+                    
+                    flight_info['itineraries'].append(itinerary_info)
+                flights.append(flight_info)
+            
+            return flights
+        except Exception as e:
+            print("No Flights found")
+            return []
 
-
-agent = ReactAgent(get_flight_details)
-response = agent.run(
-    "i want to book a flight from JFK to Los Angeles on 2025-6-4 for 1 adult. price should not exceed 200 and the currency code is USD",
-    max_rounds=3
-)
+class IntelTravelModel:
+    def __init

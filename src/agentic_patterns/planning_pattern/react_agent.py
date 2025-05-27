@@ -76,7 +76,7 @@ class ReactAgent:
         model: str = "llama-3.3-70b-versatile",
         system_prompt: str = BASE_SYSTEM_PROMPT,
     ) -> None:
-        self.client = Groq(api_key="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")
+        self.client = Groq(api_key="")
         self.model = model
         self.system_prompt = system_prompt
         self.tools = tools if isinstance(tools, list) else [tools]

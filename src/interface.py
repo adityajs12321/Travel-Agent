@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from fastapi import FastAPI
 import model
-import api_calling as api_calling
+import utils as utils
 
 answer = ""
 
@@ -20,4 +20,4 @@ def answer_question(question: str):
 
 @app.get("/answer")
 def return_answer():
-    return api_calling.return_results(api_calling.params)
+    return utils.return_results(utils.params)

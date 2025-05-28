@@ -41,7 +41,6 @@ def return_results(originLocationCode, destinationLocationCode, departureDate, a
     )
     valid_offers = []
     desired_destination = destinationLocationCode
-    print(resp.status_code)
     
     for offer in resp.json()['data']:
         segments = offer['itineraries'][0]['segments']

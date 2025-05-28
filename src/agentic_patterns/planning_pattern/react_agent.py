@@ -17,7 +17,13 @@ from agentic_patterns.utils.extraction import extract_tag_content
 
 BASE_SYSTEM_PROMPT = """
 You are a travel agent that takes user input and calls the flight search tool after extracting relevant information.
-You will then choose the best flight provided by the flights list and provide explanation for it
+You will then choose the best flight provided by the flights list AND provide explanation for it.
+
+Also provide the details of the flight chosen in the following format:
+Departure: <departure>
+Arrival: <arrival>
+No of passengers: <adults>
+Price: <price>
 """
 
 

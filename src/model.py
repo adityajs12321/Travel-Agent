@@ -62,7 +62,15 @@ def flight_search_tool(
 
             flights = []
 
-            for offer in result.get("data", [])[:5]:
+            i = 5
+            for offer in result.get("data", []):
+                if (i <= 0):
+                    break
+                i -= 1
+                segments = offer['itineraries'][0]['segments']
+                final_arrival = segments[-1]['arrival']['iataCode']
+                if final_arrival != destinationLocationCode:
+                    continue
                 flight_info = {
                     "id": offer['id'],
                     'price': offer['price']['total'],
@@ -96,6 +104,7 @@ def flight_search_tool(
             
             return flights
         except Exception as e:
+            print(e)
             print("No Flights found")
             return []
 tools_list = [flight_search_tool]
@@ -117,7 +126,7 @@ class IntelTravelModel:
         model = ReactAgent(tools_list)
         response = model.run(
             user_msg=f"""
-            I want to book a flight from JFK to LAX on 2025-06-04 for 1 adult. price should not 200. 
+            I want to book a flight from JFK to LAX on 2025-06-04 for 1 adult. price should not 200. I want it to be a single flight with no layover 
             """,
             max_rounds=3
         )

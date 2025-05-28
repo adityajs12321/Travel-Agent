@@ -1,6 +1,7 @@
 import requests
 from fastapi import FastAPI, HTTPException
 import os
+import subprocess
 
 class AmadeusClient:
     def __init__(self, client_id: str, client_secret: str, access_token: str = None):
@@ -11,6 +12,8 @@ class AmadeusClient:
 
     def get_access_token(self):
         """Get Access token from Amadeus"""
+
+        print("getting access token...")
 
         url = f"{self.base_url}/v1/security/oauth2/token"
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -23,11 +26,22 @@ class AmadeusClient:
         response = requests.post(url, headers=headers, data=data)
         if response.status_code == 200:
             self.access_token = response.json()["access_token"]
-            with open(os.path.expanduser("~/.zshrc"), "a") as outfile:
-                outfile.write(f"export AMADEUS_ACCESS_TOKEN={self.access_token}")
+            lines = []
+            os.environ['AMADEUS_ACCESS_TOKEN'] = self.access_token
+            with open(os.path.expanduser("~/.zshrc"), "r") as outfile:
+                lines_ = outfile.readlines()
+                for line in lines_:
+                    if (line == "\n"):
+                        continue
+                    if (line[:28] != "export AMADEUS_ACCESS_TOKEN="):
+                        lines.append(line)
+            with open(os.path.expanduser("~/.zshrc"), "w") as outfile:
+                outfile.writelines(lines)
+                outfile.write(f"\nexport AMADEUS_ACCESS_TOKEN='{self.access_token}'")
                 outfile.close()
             return self.access_token
         else:
+            print("Failed to authenticate")
             raise HTTPException(status_code=500, detail="Failed to authenticate with Amadeus API")
         
     def search_flights(self,
@@ -38,6 +52,8 @@ class AmadeusClient:
                        maxPrice: str,
                        currencyCode: str = "USD"):
         """Search for flights using the Flight Offers API"""
+
+        print("searching for flights...")
 
         if not self.access_token:
             print("no access token yet")
@@ -59,9 +75,9 @@ class AmadeusClient:
         if response.status_code == 200:
             return response.json()
         elif response.status_code == 401:
+            print("access token expired")
             self.get_access_token()
-            self.search_flights(
-                self,
+            new_response = self.search_flights(
                 origin,
                 destination,
                 departureDate,
@@ -69,6 +85,7 @@ class AmadeusClient:
                 maxPrice,
                 currencyCode
             )
+            return new_response
         else:
             raise HTTPException(status_code=500, detail="Flight search failed")
     

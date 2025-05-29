@@ -3,7 +3,7 @@ LLM based travel agent that uses ReAct and Reflection pattern to devise the best
 
 ## Requirements
 - An [Amadeus self service developer account](https://developers.amadeus.com/self-service) for flight and hotel data
-- Groq account for LLM usage (preferably llama3.3-70B)
+- [Groq](https://groq.com) account for LLM usage (Preferably llama3.3-70B-versatile)
 
 ## Installation
 1. Clone the repository
@@ -14,10 +14,16 @@ LLM based travel agent that uses ReAct and Reflection pattern to devise the best
 ## Example Usage
 
 ### Set your Amadeus access token
-Use the `/set` POST method to define the `client_id` and `client_secret` for access to Amadeues services and the Groq api key for LLM access.
+Use the `/set` POST method to define the `client_id` and `client_secret` for access to Amadeus services and the Groq api key for linking the LLM.
+
+![/set method](https://raw.githubusercontent.com/adityajs12321/Travel-Agent/refs/heads/main/src/imgs/set.png)
 
 ### Ask the agent for a travel plan
 Use the `/ask` POST method to set the trip details and preferences
 
+![/ask method](https://raw.githubusercontent.com/adityajs12321/Travel-Agent/refs/heads/main/src/imgs/ask.png)
+
 ### View your travel plan
 Use the `results` GET method to view the results
+
+![/results method](https://raw.githubusercontent.com/adityajs12321/Travel-Agent/refs/heads/main/src/imgs/results.png)

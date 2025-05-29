@@ -1,9 +1,13 @@
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from agentic_patterns.reflection_pattern.reflection_agent import ReflectionAgent
 from agentic_patterns.planning_pattern.react_agent import ReactAgent
 from agentic_patterns.tool_pattern.tool import tool
 from pydantic import BaseModel, Field
 from api_utils.AmadeusAPI import AmadeusClient
-import os
 
 CLIENT_ID = os.environ['AMADEUS_CLIENT_ID']
 CLIENT_SECRET = os.environ['AMADEUS_CLIENT_SECRET']
@@ -109,11 +113,9 @@ def flight_search_tool(
             return []
 tools_list = [flight_search_tool]
 
-
 tools = {
     'flight_search_tool': flight_search_tool.fn
 }
-print(tools)
 
 class IntelTravelModel:
     def trip_planning(self, request: TripRequest):
@@ -126,17 +128,26 @@ class IntelTravelModel:
         model = ReactAgent(tools_list)
         response = model.run(
             user_msg=f"""
+            Here are the travel details:
+
+            originLocationCode: {request.origin}
+            destinationLocationCode: {request.destination}
+            departureDate: {request.departure_date}
+            adults: {request.adults}
+            maxPrice: {request.maxPrice}
+            currencyCode: {request.currencyCode}
             """,
             max_rounds=3
         )
 
         return response
 
-model_agent = IntelTravelModel()
-trip_request = TripRequest(origin="JFK", 
-                           destination="LAX", 
-                           departure_date="2024-06-04", 
-                           adults="1", 
-                           maxPrice="200")
-response = model_agent.trip_planning(trip_request)
-print(response)
+# model_agent = IntelTravelModel()
+# trip_request = TripRequest(origin="JFK", 
+#                            destination="LAX", 
+#                            departure_date="2025-06-04", 
+#                            adults="1", 
+#                            maxPrice="200",
+#                            currencyCode="USD")
+# response = model_agent.trip_planning(trip_request)
+# print(response)

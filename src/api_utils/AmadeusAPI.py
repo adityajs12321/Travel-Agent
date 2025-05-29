@@ -87,6 +87,7 @@ class AmadeusClient:
             )
             return new_response
         else:
+            print(response)
             raise HTTPException(status_code=500, detail="Flight search failed")
     
     def get_airport_info(self, airport_code: str):

@@ -1,23 +1,29 @@
 from pydantic import BaseModel
 from fastapi import FastAPI
-import model
-import api_utils.utils as utils
+from model import IntelTravelModel
 
-answer = ""
+response = ""
 
 app = FastAPI()
 
+class TripRequest(BaseModel):
+    origin: str
+    destination: str
+    departure_date: str
+    adults: str
+    maxPrice: str
+    currencyCode: str
+
 @app.get("/")
 def read_root():
-    return "LLM Backend"
+    return "Intelligent Travel Agent"
 
-@app.post("/question")
-def answer_question(question: str):
-    global answer
-    answer_ = model.llm.invoke(question)
-    answer = str(answer_.content)
-    return answer
+@app.post("/ask")
+def trip_request(request: TripRequest):
+    global response
+    model = IntelTravelModel()
+    response = model.trip_planning(request)
 
-@app.get("/answer")
+@app.get("/results")
 def return_answer():
-    return utils.return_results(utils.params)
+    return response

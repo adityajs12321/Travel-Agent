@@ -2,7 +2,7 @@ from agentic_patterns.reflection_pattern.reflection_agent import ReflectionAgent
 from agentic_patterns.planning_pattern.react_agent import ReactAgent
 from agentic_patterns.tool_pattern.tool import tool
 from pydantic import BaseModel, Field
-from api_utils.AmadeusAPI import AmadeusClient
+from AmadeusAPI import AmadeusClient
 import os
 
 CLIENT_ID = os.environ['AMADEUS_CLIENT_ID']

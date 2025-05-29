@@ -9,18 +9,20 @@ from agentic_patterns.tool_pattern.tool import tool
 from pydantic import BaseModel, Field
 from api_utils.AmadeusAPI import AmadeusClient
 
-CLIENT_ID = os.environ['AMADEUS_CLIENT_ID']
-CLIENT_SECRET = os.environ['AMADEUS_CLIENT_SECRET']
+CLIENT_ID = None
+CLIENT_SECRET = None
 client = None
 
-try:
-    access_token = os.environ["AMADEUS_ACCESS_TOKEN"]
-    client = AmadeusClient(CLIENT_ID, CLIENT_SECRET, access_token)
-except Exception as e:
-    print("No access token found")
-    client = AmadeusClient(CLIENT_ID, CLIENT_SECRET)
-except Exception as e:
-    print("Client failed to connect")
+def set_access_token(client_id, client_secret):
+    global client
+    try:
+        access_token = os.environ["AMADEUS_ACCESS_TOKEN"]
+        client = AmadeusClient(client_id, client_secret, access_token)
+    except Exception as e:
+        print("No access token found")
+        client = AmadeusClient(CLIENT_ID, CLIENT_SECRET)
+    except Exception as e:
+        print("Client failed to connect")
 
 class TripRequest(BaseModel):
     origin: str = Field(..., description="Departure city/airport code")

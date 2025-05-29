@@ -2,7 +2,7 @@ from agentic_patterns.reflection_pattern.reflection_agent import ReflectionAgent
 from agentic_patterns.planning_pattern.react_agent import ReactAgent
 from agentic_patterns.tool_pattern.tool import tool
 from pydantic import BaseModel, Field
-from AmadeusAPI import AmadeusClient
+from api_utils.AmadeusAPI import AmadeusClient
 import os
 
 CLIENT_ID = os.environ['AMADEUS_CLIENT_ID']
@@ -66,11 +66,11 @@ def flight_search_tool(
             for offer in result.get("data", []):
                 if (i <= 0):
                     break
-                i -= 1
                 segments = offer['itineraries'][0]['segments']
                 final_arrival = segments[-1]['arrival']['iataCode']
                 if final_arrival != destinationLocationCode:
                     continue
+                i -= 1
                 flight_info = {
                     "id": offer['id'],
                     'price': offer['price']['total'],
@@ -126,7 +126,6 @@ class IntelTravelModel:
         model = ReactAgent(tools_list)
         response = model.run(
             user_msg=f"""
-            I want to book a flight from JFK to LAX on 2025-06-04 for 1 adult. price should not 200. I want it to be a single flight with no layover 
             """,
             max_rounds=3
         )

@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from fastapi import FastAPI
 import model
-import utils as utils
+import api_utils.utils as utils
 
 answer = ""
 

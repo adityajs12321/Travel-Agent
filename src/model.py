@@ -1,12 +1,9 @@
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 from agentic_patterns.reflection_pattern.reflection_agent import ReflectionAgent
 from agentic_patterns.planning_pattern.react_agent import ReactAgent
 from agentic_patterns.tool_pattern.tool import tool
 from pydantic import BaseModel, Field
-from api_utils.AmadeusAPI import AmadeusClient
+from AmadeusAPI import AmadeusClient
+import os
 
 CLIENT_ID = os.environ['AMADEUS_CLIENT_ID']
 CLIENT_SECRET = os.environ['AMADEUS_CLIENT_SECRET']
@@ -68,13 +65,12 @@ def flight_search_tool(
             i = 5
             for offer in result.get("data", []):
                 if (i <= 0):
-                    print("done")
                     break
+                i -= 1
                 segments = offer['itineraries'][0]['segments']
                 final_arrival = segments[-1]['arrival']['iataCode']
                 if final_arrival != destinationLocationCode:
                     continue
-                i -= 1
                 flight_info = {
                     "id": offer['id'],
                     'price': offer['price']['total'],
@@ -111,12 +107,13 @@ def flight_search_tool(
             print(e)
             print("No Flights found")
             return []
-
 tools_list = [flight_search_tool]
+
 
 tools = {
     'flight_search_tool': flight_search_tool.fn
 }
+print(tools)
 
 class IntelTravelModel:
     def trip_planning(self, request: TripRequest):
@@ -129,25 +126,18 @@ class IntelTravelModel:
         model = ReactAgent(tools_list)
         response = model.run(
             user_msg=f"""
-            The travel details are:
-                originLocationCode: {request.origin}
-                destinationLocaionCode: {request.destination}
-                departureDate: {request.departure_date} (Should be in YYYY-MM-DD format)
-                adults: {request.adults}
-                maxPrice: {request.maxPrice}
-                currencyCode: {request.currencyCode}
+            I want to book a flight from JFK to LAX on 2025-06-04 for 1 adult. price should not 200. I want it to be a single flight with no layover 
             """,
             max_rounds=3
         )
 
         return response
 
-# Testing
-# model_agent = IntelTravelModel()
-# trip_request = TripRequest(origin="JFK", 
-#                            destination="LAX", 
-#                            departure_date="2025-06-04", 
-#                            adults="1", 
-#                            maxPrice="200")
-# response = model_agent.trip_planning(trip_request)
-# print(response)
+model_agent = IntelTravelModel()
+trip_request = TripRequest(origin="JFK", 
+                           destination="LAX", 
+                           departure_date="2024-06-04", 
+                           adults="1", 
+                           maxPrice="200")
+response = model_agent.trip_planning(trip_request)
+print(response)

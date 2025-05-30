@@ -132,9 +132,9 @@ class IntelTravelModel:
             user_msg=f"""
             Here are the travel details:
 
-            originLocationCode: {request.origin}
-            destinationLocationCode: {request.destination}
-            departureDate: {request.departure_date}
+            originLocationCode: {request.origin}   (Convert to AirportCode without using tool) 
+            destinationLocationCode: {request.destination}   (Convert to AirportCode without using tool)   
+            departureDate: {request.departure_date}   (Should be in YYYY-MM-DD format)
             adults: {request.adults}
             maxPrice: {request.maxPrice}
             currencyCode: {request.currencyCode}

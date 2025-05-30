@@ -26,20 +26,20 @@ class AmadeusClient:
         response = requests.post(url, headers=headers, data=data)
         if response.status_code == 200:
             self.access_token = response.json()["access_token"]
-            lines = []
             os.environ['AMADEUS_ACCESS_TOKEN'] = self.access_token
-            with open(os.path.expanduser("~/.zshrc"), "r") as outfile:
-                lines_ = outfile.readlines()
-                for line in lines_:
-                    if (line == "\n"):
-                        continue
-                    if (line[:28] != "export AMADEUS_ACCESS_TOKEN="):
-                        lines.append(line)
-            with open(os.path.expanduser("~/.zshrc"), "w") as outfile:
-                outfile.writelines(lines)
-                outfile.write(f"\nexport AMADEUS_ACCESS_TOKEN='{self.access_token}'")
-                outfile.close()
-            return self.access_token
+            # lines = []
+            # with open(os.path.expanduser("~/.zshrc"), "r") as outfile:
+            #     lines_ = outfile.readlines()
+            #     for line in lines_:
+            #         if (line == "\n"):
+            #             continue
+            #         if (line[:28] != "export AMADEUS_ACCESS_TOKEN="):
+            #             lines.append(line)
+            # with open(os.path.expanduser("~/.zshrc"), "w") as outfile:
+            #     outfile.writelines(lines)
+            #     outfile.write(f"\nexport AMADEUS_ACCESS_TOKEN='{self.access_token}'")
+            #     outfile.close()
+            # return self.access_token
         else:
             print("Failed to authenticate")
             raise HTTPException(status_code=500, detail="Failed to authenticate with Amadeus API")

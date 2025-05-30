@@ -8,7 +8,7 @@ LLM based travel agent that uses ReAct and Reflection pattern to devise the best
 ## Installation
 1. Clone the repository
 2. Create a virtual environment within the project folder and run `pip install -r requirements.txt`
-3. Navigate to the `core` folder and run `uvicorn interface:app --reload` to host the fastapi interface
+3. Navigate to `/src/core` and run `uvicorn interface:app --reload` to host the fastapi interface
 4. Open `http://127.0.0.1:8000/docs` on your browser and use the Swagger doc to test the features
 
 ## Example Usage

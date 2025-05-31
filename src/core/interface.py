@@ -8,6 +8,10 @@ response = ""
 
 app = FastAPI()
 
+class TripPreferences(BaseModel):
+    distance_from_airport: str
+    ratings: str
+
 class TripRequest(BaseModel):
     origin: str
     destination: str
@@ -15,6 +19,7 @@ class TripRequest(BaseModel):
     adults: str
     maxPrice: str
     currencyCode: str
+    hotelPrefs: TripPreferences
 
 class APIKey(BaseModel):
     client_id: str

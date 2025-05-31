@@ -24,6 +24,10 @@ def set_access_token(client_id, client_secret):
     except Exception as e:
         print("Client failed to connect")
 
+class TripPreferences(BaseModel):
+    distance_from_airport: str
+    ratings: str
+
 class TripRequest(BaseModel):
     origin: str = Field(..., description="Departure city/airport code")
     destination: str = Field(..., description="Destination city/airport code")
@@ -31,6 +35,8 @@ class TripRequest(BaseModel):
     adults: str = Field(..., description="Number of passengers")
     maxPrice: str = Field(..., description="Maximum price of flight")
     currencyCode: str = Field("USD", description="The currency code")
+    hotelPrefs: TripPreferences
+
 
 class TravelTools:
     def __init__(self, amadeus_client: AmadeusClient):
@@ -113,24 +119,45 @@ def flight_search_tool(
             print(e)
             print("No Flights found")
             return []
-tools_list = [flight_search_tool]
 
-tools = {
-    'flight_search_tool': flight_search_tool.fn
-}
+@tool
+def hotel_search_tool(
+    cityCode: str,
+    distance_from_airport: str,
+    ratings: str
+):
+    try:
+        response = client.search_hotels(cityCode, distance_from_airport, ratings)
+    
+        hotels = []
+
+        for hotel in response.get("data", [])[:5]:
+            hotelInfo = {
+                "name": hotel["name"],
+                "hotelId": hotel["hotelId"],
+                "distance": hotel["distance"],
+                "rating": hotel["rating"]
+            }
+
+            hotels.append(hotelInfo)
+    
+        return hotels
+    except Exception as e:
+        print(e)
+        print("No hotels found")
+        return []
+
+tools_list = [flight_search_tool, hotel_search_tool]
 
 class IntelTravelModel:
     def trip_planning(self, request: TripRequest):
         """Trip planning using ReAct and Reflection patterns"""
 
-        # flights = tools['flight_search_tool'](
-        #     request
-        # )
-
         model = ReactAgent(tools_list)
         response = model.run(
             user_msg=f"""
-            Here are the travel details:
+            You are a travel agent that takes user input and calls the flight search tool after extracting relevant information.
+            You will then choose the best flight provided by the flights list AND provide explanation for it.
 
             originLocationCode: {request.origin}   (Convert to AirportCode without using tool) 
             destinationLocationCode: {request.destination}   (Convert to AirportCode without using tool)   
@@ -138,18 +165,25 @@ class IntelTravelModel:
             adults: {request.adults}
             maxPrice: {request.maxPrice}
             currencyCode: {request.currencyCode}
+            distance_from_airport: {request.hotelPrefs.distance_from_airport}
+            ratings: {request.hotelPrefs.ratings}
+
+            After providing the flight details, look up hotels near the destination by using the hotel search tool and choose the best hotel to stay in.
             """,
-            max_rounds=3
+            max_rounds=10
         )
 
         return response
 
 # model_agent = IntelTravelModel()
+# trip_prefs = TripPreferences(distance_from_airport="3",
+#                              ratings="5")
 # trip_request = TripRequest(origin="JFK", 
 #                            destination="LAX", 
 #                            departure_date="2025-06-04", 
 #                            adults="1", 
 #                            maxPrice="200",
-#                            currencyCode="USD")
+#                            currencyCode="USD",
+#                            hotelPrefs=trip_prefs)
 # response = model_agent.trip_planning(trip_request)
 # print(response)

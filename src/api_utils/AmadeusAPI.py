@@ -90,6 +90,30 @@ class AmadeusClient:
             print(response)
             raise HTTPException(status_code=500, detail="Flight search failed")
     
+    def search_hotels(self,
+                      cityCode: str,
+                      radius: str,
+                      ratings: str):
+        """Search for hotels using the Hotel Search API"""
+
+        print("searching for hotels")
+
+        url = f"{self.base_url}/v1/reference-data/locations/hotels/by-city"
+        headers = {"Authorization": f"Bearer {self.access_token}"}
+
+        params = {
+            'cityCode': cityCode,
+            'radius': radius,
+            'ratings': ratings,
+        }
+
+        response = requests.get(url, headers=headers, params=params)
+        if (response.status_code == 200):
+            return response.json()
+        else:
+            print(response)
+            raise HTTPException(status_code=500, detail="Hotel search failed")
+
     def get_airport_info(self, airport_code: str):
         """Get Airport Codes"""
 

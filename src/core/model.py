@@ -155,21 +155,7 @@ class IntelTravelModel:
 
         model = ReactAgent(tools_list)
         response = model.run(
-            user_msg=f"""
-            You are a travel agent that takes user input and calls the flight search tool after extracting relevant information.
-            You will then choose the best flight provided by the flights list AND provide explanation for it.
-
-            originLocationCode: {request.origin}   (Convert to AirportCode without using tool) 
-            destinationLocationCode: {request.destination}   (Convert to AirportCode without using tool)   
-            departureDate: {request.departure_date}   (Should be in YYYY-MM-DD format)
-            adults: {request.adults}
-            maxPrice: {request.maxPrice}
-            currencyCode: {request.currencyCode}
-            distance_from_airport: {request.hotelPrefs.distance_from_airport}
-            ratings: {request.hotelPrefs.ratings}
-
-            After providing the flight details, look up hotels near the destination by using the hotel search tool and choose the best hotel to stay in.
-            """,
+            user_msg=request,
             max_rounds=10
         )
 
@@ -187,3 +173,5 @@ class IntelTravelModel:
 #                            hotelPrefs=trip_prefs)
 # response = model_agent.trip_planning(trip_request)
 # print(response)
+
+# I would like a travel plan from new york to los angeles on 20th june 2025 for 1 adult and a max price of 200. currency code is USD and i would prefer hotels with 5 star ratings and 3 kms near the airport

@@ -37,11 +37,6 @@ class TripRequest(BaseModel):
     currencyCode: str = Field("USD", description="The currency code")
     hotelPrefs: TripPreferences
 
-
-class TravelTools:
-    def __init__(self, amadeus_client: AmadeusClient):
-        self.amadeus_client = amadeus_client
-
 @tool
 def flight_search_tool(
     originLocationCode: str,
@@ -126,6 +121,14 @@ def hotel_search_tool(
     distance_from_airport: str,
     ratings: str
 ):
+    f"""
+        Gets the hotel details provided the given details.
+
+        Args:
+            cityCode (str): The destination airport code
+            distance_from_airport (str): Max distance between hotel and airport
+            ratings (str): The hotel rating the user is looking for. (If multiple are given, wrap them as a string with comma seperated values)
+        """
     try:
         response = client.search_hotels(cityCode, distance_from_airport, ratings)
     
@@ -160,18 +163,3 @@ class IntelTravelModel:
         )
 
         return response
-
-# model_agent = IntelTravelModel()
-# trip_prefs = TripPreferences(distance_from_airport="3",
-#                              ratings="5")
-# trip_request = TripRequest(origin="JFK", 
-#                            destination="LAX", 
-#                            departure_date="2025-06-04", 
-#                            adults="1", 
-#                            maxPrice="200",
-#                            currencyCode="USD",
-#                            hotelPrefs=trip_prefs)
-# response = model_agent.trip_planning(trip_request)
-# print(response)
-
-# I would like a travel plan from new york to los angeles on 20th june 2025 for 1 adult and a max price of 200. currency code is USD and i would prefer hotels with 5 star ratings and 3 kms near the airport

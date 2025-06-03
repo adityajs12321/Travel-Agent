@@ -20,6 +20,7 @@ You are a travel agent that takes user input and calls the flight search tool af
 You will then choose the best flight provided by the flights list AND provide explanation for it.
 Convert the departureDate for flight search tool to YYYY-MM-DD format
 Convert the origin and destination to their respective iataCode
+Every parameter is a must and in case a parameter isn't provided by the user, ask for it
 
 After providing the flight details, look up hotels near the destination by using the hotel search tool and choose the best hotel to stay in.
 """
@@ -62,6 +63,16 @@ Additional constraints:
 - If the user asks you something unrelated to any of the tools above, answer freely enclosing your answer with <response></response> tags.
 """
 
+# chat_history = ChatHistory(
+#     [
+#         build_prompt_structure(
+#             prompt=BASE_SYSTEM_PROMPT,
+#             role="system",
+#         )
+#     ]
+# )
+chat_history = []
+firstTime = False
 
 class ReactAgent:
     """
@@ -153,16 +164,24 @@ class ReactAgent:
             self.system_prompt += (
                 "\n" + REACT_SYSTEM_PROMPT % self.add_tool_signatures()
             )
-
-        chat_history = ChatHistory(
-            [
-                build_prompt_structure(
-                    prompt=self.system_prompt,
-                    role="system",
-                ),
-                user_prompt,
-            ]
-        )
+        
+        global chat_history
+        global firstTime
+        if (firstTime == False):
+            chat_history = ChatHistory(
+                [
+                    build_prompt_structure(
+                        prompt=self.system_prompt,
+                        role="system",
+                    ),
+                    user_prompt,
+                ]
+            )
+            firstTime = True
+        else: chat_history.append(user_prompt)
+        # chat_history.append(user_prompt)
+        # update_chat_history(chat_history, user_prompt)
+        print(chat_history)
 
         if self.tools:
             # Run the ReAct loop for max_rounds

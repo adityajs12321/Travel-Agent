@@ -48,5 +48,3 @@ def return_results(originLocationCode, destinationLocationCode, departureDate, a
         if final_arrival == desired_destination:
             valid_offers.append(offer)
     return valid_offers
-
-print(return_results(params['originLocationCode'], params['destinationLocationCode'], params['departureDate'], params['adults'], params['maxPrice'], params['currencyCode']))

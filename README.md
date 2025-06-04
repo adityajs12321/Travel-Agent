@@ -9,11 +9,11 @@ LLM based travel agent that uses ReAct and Reflection pattern to devise the best
 1. Clone the repository
 2. Create a virtual environment within the project folder and run `pip install -r requirements.txt`
 3. Navigate to `/src/core` and run `uvicorn interface:app --reload` to host the fastapi interface
-4. Open `http://127.0.0.1:8000/docs` on your browser and use the Swagger doc to test the features
+4. Open `http://localhost:8000/docs` on your browser and use the Swagger doc to test the features
 
 ## Example Usage
 
-### Set your Amadeus access token
+### Set your Amadeus access token and Groq API Key
 Use the `/set` POST method to define the `client_id` and `client_secret` for access to Amadeus services and the Groq api key for linking the LLM.
 
 ![/set method](https://raw.githubusercontent.com/adityajs12321/Travel-Agent/refs/heads/main/src/imgs/set.png)

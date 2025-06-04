@@ -27,3 +27,8 @@ Use the `/ask` POST method to set the trip details and preferences
 Use the `results` GET method to view the results
 
 ![/results method](https://raw.githubusercontent.com/adityajs12321/Travel-Agent/refs/heads/main/src/imgs/results.png)
+
+## LICENCE
+MIT Licence
+
+Huge thanks to [neural-maze](https://github.com/neural-maze) for [agentic-patterns](https://github.com/neural-maze/agentic-patterns-course), which this application depends on (Licenced under MIT Licence).

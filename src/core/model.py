@@ -153,11 +153,12 @@ def hotel_search_tool(
 tools_list = [flight_search_tool, hotel_search_tool]
 
 class IntelTravelModel:
-    def trip_planning(self, request: TripRequest):
+    def trip_planning(self, conversation_id: int, request: TripRequest):
         """Trip planning using ReAct and Reflection patterns"""
 
         model = ReactAgent(tools_list)
         response = model.run(
+            conversation_id=conversation_id,
             user_msg=request,
             max_rounds=10
         )

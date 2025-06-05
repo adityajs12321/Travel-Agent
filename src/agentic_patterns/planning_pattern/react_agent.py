@@ -17,12 +17,12 @@ from agentic_patterns.utils.extraction import extract_tag_content
 
 BASE_SYSTEM_PROMPT = """
 You are a travel agent that takes user input and calls the flight search tool after extracting relevant information.
-You will then choose the best flight provided by the flights list AND provide explanation for it.
+You will then choose the best flight provided by the flights list and list the flight details
 Convert the departureDate for flight search tool to YYYY-MM-DD format
 Convert the origin and destination to their respective iataCode
 Every parameter is a must and in case a parameter isn't provided by the user, ask for it
 
-After providing the flight details, look up hotels near the destination by using the hotel search tool and choose the best hotel to stay in.
+If the user asks for hotels, look up hotels near the destination by using the hotel search tool and choose the best hotel to stay in.
 """
 
 
@@ -60,7 +60,7 @@ You then output:
 
 Additional constraints:
 
-- If the user asks you something unrelated to any of the tools above, answer freely enclosing your answer with <response></response> tags.
+- If the user asks you something unrelated to any of the tools above, say that you are strictly a travel agent and you can't help with that.
 """
 
 # chat_history = ChatHistory(
@@ -71,8 +71,7 @@ Additional constraints:
 #         )
 #     ]
 # )
-chat_history = []
-firstTime = False
+chat_history_ids = {}
 
 class ReactAgent:
     """
@@ -142,6 +141,7 @@ class ReactAgent:
 
     def run(
         self,
+        conversation_id: int,
         user_msg: str,
         max_rounds: int = 10,
     ) -> str:
@@ -165,9 +165,8 @@ class ReactAgent:
                 "\n" + REACT_SYSTEM_PROMPT % self.add_tool_signatures()
             )
         
-        global chat_history
-        global firstTime
-        if (firstTime == False):
+        global chat_history_ids
+        if (chat_history_ids.get(conversation_id) == None):
             chat_history = ChatHistory(
                 [
                     build_prompt_structure(
@@ -177,17 +176,17 @@ class ReactAgent:
                     user_prompt,
                 ]
             )
-            firstTime = True
-        else: chat_history.append(user_prompt)
+            chat_history_ids[conversation_id] = chat_history
+        else: chat_history_ids[conversation_id].append(user_prompt)
         # chat_history.append(user_prompt)
         # update_chat_history(chat_history, user_prompt)
-        print(chat_history)
+        print(chat_history_ids.get(conversation_id))
 
         if self.tools:
             # Run the ReAct loop for max_rounds
             for _ in range(max_rounds):
 
-                completion = completions_create(self.client, chat_history, self.model)
+                completion = completions_create(self.client, chat_history_ids[conversation_id], self.model)
                 
                 response = extract_tag_content(str(completion), "response")
                 if response.found:
@@ -196,13 +195,13 @@ class ReactAgent:
                 thought = extract_tag_content(str(completion), "thought")
                 tool_calls = extract_tag_content(str(completion), "tool_call")
 
-                update_chat_history(chat_history, completion, "assistant")
+                update_chat_history(chat_history_ids[conversation_id], completion, "assistant")
 
                 print(Fore.MAGENTA + f"\nThought: {thought.content[0]}")
 
                 if tool_calls.found:
                     observations = self.process_tool_calls(tool_calls.content)
                     print(Fore.BLUE + f"\nObservations: {observations}")
-                    update_chat_history(chat_history, f"{observations}", "user")
+                    update_chat_history(chat_history_ids[conversation_id], f"{observations}", "user")
 
-        return completions_create(self.client, chat_history, self.model)
+        return completions_create(self.client, chat_history_ids[conversation_id], self.model)

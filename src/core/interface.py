@@ -48,7 +48,7 @@ def set_api_keys(api_keys: APIKey):
     model.set_access_token(model.CLIENT_ID, model.CLIENT_SECRET)
 
 @app.post("/ask")
-def trip_request(request: str):
+def trip_request(conversation_id: int, request: str):
     """
     Handles trip planning requests.
     
@@ -60,5 +60,8 @@ def trip_request(request: str):
     """
     global response
     model = IntelTravelModel()
-    response = model.trip_planning(request)
-    return response
+    response = model.trip_planning(conversation_id, request)
+    return {
+        "Response": response,
+        "Conversation ID": conversation_id
+    }

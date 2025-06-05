@@ -19,14 +19,9 @@ Use the `/set` POST method to define the `client_id` and `client_secret` for acc
 ![/set method](https://raw.githubusercontent.com/adityajs12321/Travel-Agent/refs/heads/main/src/imgs/set.png)
 
 ### Ask the agent for a travel plan
-Use the `/ask` POST method to set the trip details and preferences
+Use the `/ask` POST method to set the trip details and preferences, and view the response in the response body.
 
 ![/ask method](https://raw.githubusercontent.com/adityajs12321/Travel-Agent/refs/heads/main/src/imgs/ask.png)
-
-### View your travel plan
-Use the `results` GET method to view the results
-
-![/results method](https://raw.githubusercontent.com/adityajs12321/Travel-Agent/refs/heads/main/src/imgs/results.png)
 
 ## LICENCE
 MIT Licence

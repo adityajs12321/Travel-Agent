@@ -16,12 +16,12 @@ LLM based travel agent that uses ReAct and Reflection pattern to devise the best
 ### Set your Amadeus access token and Groq API Key
 Use the `/set` POST method to define the `client_id` and `client_secret` for access to Amadeus services and the Groq api key for linking the LLM.
 
-![/set method](https://raw.githubusercontent.com/adityajs12321/Travel-Agent/refs/heads/main/src/imgs/set.png)
+![/set method](https://raw.githubusercontent.com/adityajs12321/Travel-Agent/refs/heads/main/src/imgs/set2.png)
 
 ### Ask the agent for a travel plan
 Use the `/ask` POST method to set the trip details and preferences, and view the response in the response body.
 
-![/ask method](https://raw.githubusercontent.com/adityajs12321/Travel-Agent/refs/heads/main/src/imgs/ask.png)
+![/ask method](https://raw.githubusercontent.com/adityajs12321/Travel-Agent/refs/heads/main/src/imgs/ask2.png)
 
 ## LICENCE
 MIT Licence

@@ -2,6 +2,7 @@ import json
 import re
 from typing import Union
 import os
+from pathlib import Path
 
 from colorama import Fore
 from groq import Groq
@@ -17,12 +18,13 @@ from agentic_patterns.utils.extraction import extract_tag_content
 
 BASE_SYSTEM_PROMPT = """
 You are a travel agent that takes user input and calls the flight search tool after extracting relevant information.
-You will then choose the best flight provided by the flights list and list the flight details
+You can only suggest travel plans, not book them.
+You will then choose (choose not book) the best flight provided by the flights list and list the flight details only
 Convert the departureDate for flight search tool to YYYY-MM-DD format
 Convert the origin and destination to their respective iataCode
 Every parameter is a must and in case a parameter isn't provided by the user, ask for it
 
-If the user asks for hotels, look up hotels near the destination by using the hotel search tool and choose the best hotel to stay in.
+If the user asks for hotels, look up hotels near the destination by using the hotel search tool and choose the best hotel to stay in wi.
 """
 
 
@@ -73,6 +75,48 @@ Additional constraints:
 # )
 chat_history_ids = {}
 
+def save_chat_history(chat_history_ids: dict, file_path: str = "chat_history.json") -> None:
+    """
+    Save chat history to a JSON file.
+    
+    Args:
+        chat_history_ids (dict): Dictionary containing chat histories
+        file_path (str): Path to save the JSON file
+    """
+    # Convert chat history to serializable format
+    serializable_history = {}
+    for conv_id, history in chat_history_ids.items():
+        serializable_history[str(conv_id)] = history.to_dict()
+    
+    with open(file_path, 'w') as f:
+        json.dump(serializable_history, f)
+
+def load_chat_history(file_path: str = "chat_history.json") -> dict:
+    """
+    Load chat history from a JSON file.
+    
+    Args:
+        file_path (str): Path to load the JSON file from
+        
+    Returns:
+        dict: Dictionary containing chat histories
+    """
+    if not Path(file_path).exists():
+        print(Fore.RED + "No chat history file found")
+        return {}
+        
+    with open(file_path, 'r') as f:
+        serialized_history = json.load(f)
+        print(Fore.GREEN + "Successfully loaded chat history")
+    
+    # Convert back to ChatHistory objects
+    chat_history_ids = {}
+    for conv_id, history_dict in serialized_history.items():
+        chat_history_ids[int(conv_id)] = ChatHistory.from_dict(history_dict)
+    
+    return chat_history_ids
+
+
 class ReactAgent:
     """
     A class that represents an agent using the ReAct logic that interacts with tools to process
@@ -91,12 +135,16 @@ class ReactAgent:
         tools: Union[Tool, list[Tool]],
         model: str = "llama-3.3-70b-versatile",
         system_prompt: str = BASE_SYSTEM_PROMPT,
+        chat_history_file: str = "chat_history.json"
     ) -> None:
         self.client = Groq(api_key=os.environ['GROQ_API_KEY'])
         self.model = model
         self.system_prompt = system_prompt
         self.tools = tools if isinstance(tools, list) else [tools]
         self.tools_dict = {tool.name: tool for tool in self.tools}
+        self.chat_history_file = chat_history_file
+        global chat_history_ids
+        chat_history_ids = load_chat_history(chat_history_file)
 
     def add_tool_signatures(self) -> str:
         """
@@ -190,6 +238,7 @@ class ReactAgent:
                 
                 response = extract_tag_content(str(completion), "response")
                 if response.found:
+                    save_chat_history(chat_history_ids, self.chat_history_file)
                     return response.content[0]
 
                 thought = extract_tag_content(str(completion), "thought")
@@ -197,11 +246,13 @@ class ReactAgent:
 
                 update_chat_history(chat_history_ids[conversation_id], completion, "assistant")
 
-                print(Fore.MAGENTA + f"\nThought: {thought.content[0]}")
+                if (thought.found): print(Fore.MAGENTA + f"\nThought: {thought.content[0]}")
 
                 if tool_calls.found:
                     observations = self.process_tool_calls(tool_calls.content)
                     print(Fore.BLUE + f"\nObservations: {observations}")
                     update_chat_history(chat_history_ids[conversation_id], f"{observations}", "user")
 
+        # Save chat history after each interaction
+        save_chat_history(chat_history_ids, self.chat_history_file)
         return completions_create(self.client, chat_history_ids[conversation_id], self.model)

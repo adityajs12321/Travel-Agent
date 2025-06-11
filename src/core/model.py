@@ -13,16 +13,30 @@ CLIENT_ID = None
 CLIENT_SECRET = None
 client = None
 
+BASE_SYSTEM_PROMPT = """
+You are a travel agent that takes user input and calls the flight search tool after extracting relevant information.
+You can only suggest travel plans, not book them.
+You will then choose (choose not book) the best flight provided by the flights list and list the flight details only
+Convert the departureDate for flight search tool to YYYY-MM-DD format
+Convert the origin and destination to their respective iataCode
+Every parameter is a must and in case a parameter isn't provided by the user, ask for it
+
+If the user asks for hotels, look up hotels near the destination by using the hotel search tool and choose the best hotel to stay in wi.
+"""
+
 def set_access_token(client_id, client_secret):
-    global client
+    global client, CLIENT_ID, CLIENT_SECRET
+    CLIENT_ID = client_id
+    CLIENT_SECRET = client_secret
     try:
-        access_token = os.environ["AMADEUS_ACCESS_TOKEN"]
-        client = AmadeusClient(client_id, client_secret, access_token)
+        access_token = os.environ.get("AMADEUS_ACCESS_TOKEN")
+        if access_token:
+            client = AmadeusClient(client_id, client_secret, access_token)
+        else:
+            client = AmadeusClient(client_id, client_secret)
     except Exception as e:
-        print("No access token found")
-        client = AmadeusClient(CLIENT_ID, CLIENT_SECRET)
-    except Exception as e:
-        print("Client failed to connect")
+        print(f"Client failed to connect: {e}")
+        client = None
 
 class TripPreferences(BaseModel):
     distance_from_airport: str
@@ -153,10 +167,10 @@ def hotel_search_tool(
 tools_list = [flight_search_tool, hotel_search_tool]
 
 class IntelTravelModel:
-    def trip_planning(self, conversation_id: int, request: TripRequest):
+    def trip_planning(self, conversation_id: int, request: str):
         """Trip planning using ReAct and Reflection patterns"""
 
-        model = ReactAgent(tools_list)
+        model = ReactAgent(tools_list, system_prompt=BASE_SYSTEM_PROMPT)
         response = model.run(
             conversation_id=conversation_id,
             user_msg=request,

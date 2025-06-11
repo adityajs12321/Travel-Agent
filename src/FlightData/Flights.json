@@ -1,0 +1,104 @@
+{
+    "Flights": [
+        {
+            "flightNumber": "AI101",
+            "airline": "AirIndia",
+            "origin": "BLR",
+            "destination": "DEL",
+            "departureTime": "08:30",
+            "arrivalTime": "11:15",
+            "duration": "2h 45m",
+            "price": 4500
+        },
+        {
+            "flightNumber": "6E205",
+            "airline": "IndiGo",
+            "origin": "MUM",
+            "destination": "BLR",
+            "departureTime": "10:15",
+            "arrivalTime": "12:00",
+            "duration": "1h 45m",
+            "price": 3800
+        },
+        {
+            "flightNumber": "SG301",
+            "airline": "SpiceJet",
+            "origin": "TRV",
+            "destination": "MUM",
+            "departureTime": "13:45",
+            "arrivalTime": "16:30",
+            "duration": "2h 45m",
+            "price": 4200
+        },
+        {
+            "flightNumber": "UK801",
+            "airline": "Vistara",
+            "origin": "DEL",
+            "destination": "MAA",
+            "departureTime": "09:00",
+            "arrivalTime": "11:30",
+            "duration": "2h 30m",
+            "price": 4800
+        },
+        {
+            "flightNumber": "AI503",
+            "airline": "AirIndia",
+            "origin": "MAA",
+            "destination": "TRV",
+            "departureTime": "14:20",
+            "arrivalTime": "15:50",
+            "duration": "1h 30m",
+            "price": 3500
+        },
+        {
+            "flightNumber": "6E402",
+            "airline": "IndiGo",
+            "origin": "BLR",
+            "destination": "TRV",
+            "departureTime": "11:30",
+            "arrivalTime": "13:15",
+            "duration": "1h 45m",
+            "price": 3900
+        },
+        {
+            "flightNumber": "SG601",
+            "airline": "SpiceJet",
+            "origin": "DEL",
+            "destination": "BLR",
+            "departureTime": "15:45",
+            "arrivalTime": "18:30",
+            "duration": "2h 45m",
+            "price": 4100
+        },
+        {
+            "flightNumber": "UK901",
+            "airline": "Vistara",
+            "origin": "MUM",
+            "destination": "MAA",
+            "departureTime": "16:30",
+            "arrivalTime": "18:45",
+            "duration": "2h 15m",
+            "price": 4600
+        },
+        {
+            "flightNumber": "AI701",
+            "airline": "AirIndia",
+            "origin": "TRV",
+            "destination": "DEL",
+            "departureTime": "17:15",
+            "arrivalTime": "20:00",
+            "duration": "2h 45m",
+            "price": 4700
+        },
+        {
+            "flightNumber": "6E802",
+            "airline": "IndiGo",
+            "origin": "MAA",
+            "destination": "MUM",
+            "departureTime": "19:00",
+            "arrivalTime": "21:15",
+            "duration": "2h 15m",
+            "price": 4000
+        }
+    ]
+}

@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from fastapi import FastAPI
-from model import IntelTravelModel
-import model
+from model_v2 import IntelTravelModel
+import model_v2
 import os
 
 response = ""
@@ -42,10 +42,10 @@ def set_api_keys(api_keys: APIKey):
     Args:
         api_keys (APIKey): Object containing client ID, client secret and Groq API key
     """
-    model.CLIENT_ID = api_keys.client_id
-    model.CLIENT_SECRET = api_keys.client_secret
+    model_v2.CLIENT_ID = api_keys.client_id
+    model_v2.CLIENT_SECRET = api_keys.client_secret
     os.environ["GROQ_API_KEY"] = api_keys.groq_api_key
-    model.set_access_token(model.CLIENT_ID, model.CLIENT_SECRET)
+    model_v2.set_access_token(model_v2.CLIENT_ID, model_v2.CLIENT_SECRET)
 
 @app.post("/ask")
 def trip_request(conversation_id: int, request: str):

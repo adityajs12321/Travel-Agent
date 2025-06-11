@@ -67,6 +67,29 @@ class ChatHistory(list):
         if len(self) == self.total_length:
             self.pop(0)
         super().append(msg)
+        
+    def to_dict(self) -> dict:
+        """Convert the chat history to a dictionary for serialization.
+        
+        Returns:
+            dict: A dictionary containing the messages and total_length
+        """
+        return {
+            "messages": list(self),  # Convert list to regular list for JSON serialization
+            "total_length": self.total_length
+        }
+    
+    @classmethod
+    def from_dict(cls, data: dict) -> 'ChatHistory':
+        """Create a ChatHistory instance from a dictionary.
+        
+        Args:
+            data (dict): Dictionary containing messages and total_length
+            
+        Returns:
+            ChatHistory: A new ChatHistory instance
+        """
+        return cls(messages=data["messages"], total_length=data["total_length"])
 
 
 class FixedFirstChatHistory(ChatHistory):

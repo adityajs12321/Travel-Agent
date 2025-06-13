@@ -112,7 +112,7 @@ def load_chat_history(file_path: str = "chat_history.json") -> dict:
     # Convert back to ChatHistory objects
     chat_history_ids = {}
     for conv_id, history_dict in serialized_history.items():
-        chat_history_ids[int(conv_id)] = ChatHistory.from_dict(history_dict)
+        chat_history_ids[conv_id] = ChatHistory.from_dict(history_dict)
     
     return chat_history_ids
 

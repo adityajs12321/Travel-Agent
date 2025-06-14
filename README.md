@@ -1,6 +1,10 @@
 # Intelligent Travel Agent
 LLM based travel agent that uses ReAct and Reflection pattern to devise the best travel plan, wrapped in FastAPI's interface.
 
+## Features
+- Now supports alternative flight data sources (JSON files, PDFs) that can be updated with relevant information.
+- `model.py` contains support for flight and hotel suggestions using the Amadeus API, `model_v2.py` retrieves information from the .json files and PDFs.
+
 ## Requirements
 - An [Amadeus self service developer account](https://developers.amadeus.com/self-service) for flight and hotel data
 - [Groq](https://groq.com) account for LLM usage (Preferably llama3.3-70B-versatile)

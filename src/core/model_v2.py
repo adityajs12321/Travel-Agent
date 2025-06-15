@@ -10,7 +10,7 @@ from agentic_patterns.tool_pattern.tool import tool
 from pydantic import BaseModel, Field
 from api_utils.AmadeusAPI import AmadeusClient
 from RAG.rag import RAG
-
+from Models.model_config import ModelAdapter
 
 CLIENT_ID = None
 CLIENT_SECRET = None
@@ -23,7 +23,7 @@ You will then choose (choose not book) the best flight provided by the flights l
 Convert the origin and destination to their respective iataCode.
 Both origin and destination are required.
 
-If the user asks for the details or policies of the flight, you will use the flight_policies_tool to search for the policies and return the relevant policies according to the user's query verbatim.
+If the user asks for the details or policies of the flight (meals, baggage, etc.), you will use the flight_policies_tool to search for the policies and return the relevant policies according to the user's query verbatim. /no_think
 """
 
 def set_access_token(client_id, client_secret):
@@ -107,11 +107,14 @@ def flight_policies_tool(
 
 tools_list = [flight_search_tool, flight_policies_tool]
 
+# client = ModelAdapter(client_name="ollama", model="qwen3", api_key=os.getenv("GEMINI_API_KEY"))
+client = ModelAdapter(client_name="groq", model="llama-3.3-70b-versatile", api_key=os.getenv("GROQ_API_KEY"))
+
 class IntelTravelModel:
     def trip_planning(self, conversation_id: int, request: str):
         """Trip planning using ReAct and Reflection patterns"""
 
-        model = ReactAgent(tools_list, system_prompt=BASE_SYSTEM_PROMPT)
+        model = ReactAgent(tools_list, client, system_prompt=BASE_SYSTEM_PROMPT)
         response = model.run(
             conversation_id=conversation_id,
             user_msg=request,

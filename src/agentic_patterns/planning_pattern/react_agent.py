@@ -133,12 +133,11 @@ class ReactAgent:
     def __init__(
         self,
         tools: Union[Tool, list[Tool]],
-        model: str = "llama-3.3-70b-versatile",
+        client,
         system_prompt: str = BASE_SYSTEM_PROMPT,
         chat_history_file: str = "chat_history.json"
     ) -> None:
-        self.client = Groq(api_key=os.environ['GROQ_API_KEY'])
-        self.model = model
+        self.client = client
         self.system_prompt = system_prompt
         self.tools = tools if isinstance(tools, list) else [tools]
         self.tools_dict = {tool.name: tool for tool in self.tools}
@@ -228,13 +227,13 @@ class ReactAgent:
         else: chat_history_ids[conversation_id].append(user_prompt)
         # chat_history.append(user_prompt)
         # update_chat_history(chat_history, user_prompt)
-        print(chat_history_ids.get(conversation_id))
+        # print(chat_history_ids.get(conversation_id))
 
         if self.tools:
             # Run the ReAct loop for max_rounds
             for _ in range(max_rounds):
 
-                completion = completions_create(self.client, chat_history_ids[conversation_id], self.model)
+                completion = completions_create(self.client, chat_history_ids[conversation_id])
                 
                 response = extract_tag_content(str(completion), "response")
                 if response.found:
@@ -255,4 +254,4 @@ class ReactAgent:
 
         # Save chat history after each interaction
         save_chat_history(chat_history_ids, self.chat_history_file)
-        return completions_create(self.client, chat_history_ids[conversation_id], self.model)
+        return completions_create(self.client, chat_history_ids[conversation_id])

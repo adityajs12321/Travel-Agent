@@ -1,6 +1,6 @@
 from typing import Union
 
-def completions_create(client, messages: list, model: str) -> str:
+def completions_create(model, messages: list) -> str:
     """
     Sends a request to the client's `completions.create` method to interact with the language model.
 
@@ -12,8 +12,8 @@ def completions_create(client, messages: list, model: str) -> str:
     Returns:
         str: The content of the model's response.
     """
-    response = client.chat.completions.create(messages=messages, model=model)
-    return str(response.choices[0].message.content)
+    print(messages)
+    return model.response(messages)
 
 
 def build_prompt_structure(prompt: str, role: str, tag: str = "") -> dict:

@@ -65,6 +65,8 @@ Additional constraints:
 - If the user asks you something unrelated to any of the tools above, say that you are strictly a travel agent and you can't help with that.
 """
 
+additional_constraints = "- You can answer greet and info responses, like 'Hello, how can I help you today?' or 'I'm here to help you with your travel plans."
+
 # chat_history = ChatHistory(
 #     [
 #         build_prompt_structure(
@@ -135,13 +137,15 @@ class ReactAgent:
         tools: Union[Tool, list[Tool]],
         client,
         system_prompt: str = BASE_SYSTEM_PROMPT,
-        chat_history_file: str = "chat_history.json"
+        chat_history_file: str = "chat_history.json",
+        add_constraints: bool = True
     ) -> None:
         self.client = client
         self.system_prompt = system_prompt
         self.tools = tools if isinstance(tools, list) else [tools]
         self.tools_dict = {tool.name: tool for tool in self.tools}
         self.chat_history_file = chat_history_file
+        self.add_constraints = add_constraints
         global chat_history_ids
         chat_history_ids = load_chat_history(chat_history_file)
 
@@ -207,9 +211,10 @@ class ReactAgent:
         user_prompt = build_prompt_structure(
             prompt=user_msg, role="user", tag="question"
         )
+        global additional_constraints
         if self.tools:
             self.system_prompt += (
-                "\n" + REACT_SYSTEM_PROMPT % self.add_tool_signatures()
+                "\n" + REACT_SYSTEM_PROMPT % self.add_tool_signatures() + (additional_constraints if self.add_constraints else "")
             )
         
         global chat_history_ids
@@ -251,6 +256,7 @@ class ReactAgent:
                     observations = self.process_tool_calls(tool_calls.content)
                     print(Fore.BLUE + f"\nObservations: {observations}")
                     update_chat_history(chat_history_ids[conversation_id], f"{observations}", "user")
+                    # chat_history_ids[conversation_id].append(user_prompt)
 
         # Save chat history after each interaction
         save_chat_history(chat_history_ids, self.chat_history_file)

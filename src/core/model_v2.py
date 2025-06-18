@@ -16,15 +16,6 @@ CLIENT_ID = None
 CLIENT_SECRET = None
 client = None
 
-BASE_SYSTEM_PROMPT = """
-You are a travel agent that takes user input and calls the flight search tool after extracting relevant information.
-You can only suggest travel plans, not book them.
-You will then choose (choose not book) the best flight provided by the flights list and list the flight details only.
-Convert the origin and destination to their respective iataCode.
-Both origin and destination are required.
-
-If the user asks for the details or policies of the flight (meals, baggage, etc.), you will use the flight_policies_tool to search for the policies and return the relevant policies according to the user's query verbatim. /no_think
-"""
 
 def set_access_token(client_id, client_secret):
     global client, CLIENT_ID, CLIENT_SECRET
@@ -97,6 +88,8 @@ def flight_policies_tool(
     # Go up to the common parent directory (src)
     parent_dir = os.path.dirname(current_dir)
 
+    flight_name = "".join(flight_name.split())
+
     # Now navigate to the FlightData directory
     file_path = os.path.join(parent_dir, "FlightData", "FlightPolicies", f"{flight_name}.pdf")
     
@@ -107,14 +100,16 @@ def flight_policies_tool(
 
 tools_list = [flight_search_tool, flight_policies_tool]
 
-# client = ModelAdapter(client_name="ollama", model="qwen3", api_key=os.getenv("GEMINI_API_KEY"))
-client = ModelAdapter(client_name="groq", model="llama-3.3-70b-versatile", api_key=os.getenv("GROQ_API_KEY"))
+# client = ModelAdapter(client_name="ollama", model="llama3.1:8b", api_key=os.getenv("GEMINI_API_KEY"))
+# client = ModelAdapter(client_name="groq", model="llama-3.3-70b-versatile", api_key=os.getenv("GROQ_API_KEY"))
+# client = ModelAdapter(client_name="gemini", model="gemini-2.0-flash", api_key=os.getenv("GEMINI_API_KEY"))
+
 
 class IntelTravelModel:
-    def trip_planning(self, conversation_id: int, request: str):
+    def trip_planning(self, conversation_id: str, request: str, client: ModelAdapter):
         """Trip planning using ReAct and Reflection patterns"""
 
-        model = ReactAgent(tools_list, client, system_prompt=BASE_SYSTEM_PROMPT)
+        model = ReactAgent(tools_list, client, system_prompt=client.system_prompt, add_constraints=client.add_constraints)
         response = model.run(
             conversation_id=conversation_id,
             user_msg=request,

@@ -1,9 +1,22 @@
-import lmstudio as lms
+from ollama import chat
+from pydantic import BaseModel
 
-model = lms.llm("qwen3-8b-mlx", config={
-    "contextLength": 2048,
-})
+class ResponseFormat(BaseModel):
+    users_query: str
+    assistant_response: str
 
-model.model = "qwen3-8b-mlx"
+response = chat(
+  messages=[
+    {
+      'role': 'user',
+      'content': '''
+        hello how are you?
+      ''',
+    }
+  ],
+  model='llama3.1:8b',
+  format=ResponseFormat.model_json_schema(),
+)
 
-print(model.respond("hello how are you /no_think").content)
+pets = ResponseFormat.model_validate_json(response.message.content)
+print(pets)

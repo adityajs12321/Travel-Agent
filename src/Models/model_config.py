@@ -92,7 +92,19 @@ MODEL_CONFIGS = {
     "ollama": {
         "client_name": "ollama",
         # "client": ChatOllama(num_ctx=4096, temperature=0.1, top_k=75, top_p=0.65),
-        "client": ChatOllama(num_ctx=4096, temperature=0.1, top_k=80, top_p=0.65),
+        "client": ChatOllama,
+        # "client_settings": {
+        #     "num_ctx": 4096, 
+        #     "temperature": 0.1, 
+        #     "top_k": 80, 
+        #     "top_p": 0.65
+        # },
+        "client_settings": {
+            "num_ctx": 4096, 
+            "temperature": 0.1, 
+            "top_k": 80, 
+            "top_p": 0.65
+        },
         # "client": ChatOllama(num_ctx=4096, temperature=0.1, top_k=100, top_p=0.65),
         "response_generator": ollama_response,
         "system_prompt": OLLAMA_SYSTEM_PROMPT
@@ -115,7 +127,7 @@ class ModelAdapter:
         self.client_name = client_name
         self.api_key = api_key
         self.model = model
-        self.client = MODEL_CONFIGS[client_name]["client"]
+        self.client = MODEL_CONFIGS[client_name]["client"](**MODEL_CONFIGS[client_name]["client_settings"])
         self.add_constraints = True
         if self.client_name == "groq":
             self.client.api_key = self.api_key
@@ -128,4 +140,3 @@ class ModelAdapter:
 
     def response(self, messages: list) -> str:
         return MODEL_CONFIGS[self.client_name]["response_generator"](self.client, messages, self.model)
-        

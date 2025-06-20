@@ -15,7 +15,7 @@ AGENT_CONFIG = {
 
 routing_agent = RouterAgent()
 
-message = "what is the baggage limit for economy class"
+message = "what are the different ways to check in"
 
 response = routing_agent.response(message)
 

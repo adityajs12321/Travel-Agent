@@ -16,7 +16,7 @@ You will be given a list of agents in the following format:
 [
     {0: {
         "name": "greeting_agent",
-        "description": "The greeting agent is responsible for greeting the user and introducing the travel agent."
+        "description": "The greeting agent is responsible for greeting the user and introducing the travel agent. Do not use it for specific information"
     },
     {1: {
         "name": "travel_agent",

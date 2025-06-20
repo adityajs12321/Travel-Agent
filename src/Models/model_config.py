@@ -101,8 +101,8 @@ MODEL_CONFIGS = {
         # },
         "client_settings": {
             "num_ctx": 4096, 
-            "temperature": 0.1, 
-            "top_k": 80, 
+            "temperature": 0.5, 
+            "top_k": 50, 
             "top_p": 0.65
         },
         # "client": ChatOllama(num_ctx=4096, temperature=0.1, top_k=100, top_p=0.65),

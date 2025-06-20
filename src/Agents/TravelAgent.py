@@ -14,7 +14,7 @@ model = ModelAdapter(client_name="ollama", model="gemma3:4b", api_key="null")
 
 SYSTEM_PROMPT = """
 You are a travel agent that takes user input and calls the flight search tool ONCE after extracting relevant information.
-You will then choose (choose not book) the best flight provided by the flights list and list the flight details only.
+You will then choose (choose NOT book) the best flight provided by the flights list and list the flight details only.
 
 Convert the origin and destination to their respective iataCode. DO NOT USE TOOL FOR IATA CODE.
 Both origin and destination are required.
@@ -62,7 +62,7 @@ def flight_policies_tool(
         Gets the flight policies provided the given flight number.
 
         Args:
-            flight_name (str): The airline name (ONLY THE AIRLINE NAME, NOT THE FLIGHT NUMBER, AND REMOVE ANY SPACE INBETWEEN)
+            flight_name (str): The airline name (ONLY THE AIRLINE NAME, NOT THE FLIGHT NUMBER)
             query (str): The user's request (copy the user's request exactly word for word)
     """
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -89,7 +89,7 @@ class TravelAgent:
     def response(self, message: str):
         react_agent = ReactAgent(tools_list, self.model, system_prompt=SYSTEM_PROMPT, add_constraints=self.model.add_constraints)
         response = react_agent.run(
-            conversation_id="2",
+            conversation_id="6",
             user_msg=message,
             max_rounds=10
         )

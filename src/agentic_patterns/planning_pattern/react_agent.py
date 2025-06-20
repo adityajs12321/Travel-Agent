@@ -234,6 +234,15 @@ class ReactAgent:
         # update_chat_history(chat_history, user_prompt)
         # print(chat_history_ids.get(conversation_id))
 
+        if (len(chat_history_ids[conversation_id]) >= 6):
+            _message = json.dumps(chat_history_ids[conversation_id][1:-1])
+            summarisation_messages = [
+                {"role": "system", "content": "Your job is to summarise the user's input in about 100 words"},
+                {"role": "user", "content": _message}
+            ]
+            summarised_context = completions_create(self.client, summarisation_messages)
+            chat_history_ids[conversation_id][1:-1] = [{"role": "assistant", "content": summarised_context}]
+
         if self.tools:
             # Run the ReAct loop for max_rounds
             for _ in range(max_rounds):

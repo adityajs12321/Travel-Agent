@@ -13,7 +13,7 @@ def completions_create(model, messages: list) -> str:
         str: The content of the model's response.
     """
     print(messages)
-    return model.response(messages)
+    return model.response(messages0)
 
 
 def build_prompt_structure(prompt: str, role: str, tag: str = "") -> dict:

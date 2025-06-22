@@ -95,16 +95,22 @@ MODEL_CONFIGS = {
         "client": ChatOllama,
         # "client_settings": {
         #     "num_ctx": 4096, 
-        #     "temperature": 0.1, 
+        #     "temperature": 0.1,              # llama3.1 8b optimal settings
         #     "top_k": 80, 
         #     "top_p": 0.65
         # },
         "client_settings": {
             "num_ctx": 4096, 
-            "temperature": 0.5, 
+            "temperature": 0.5,                # gemma3 4b optimal settings (for now)
             "top_k": 50, 
             "top_p": 0.65
         },
+        # "client_settings": {
+        #     "num_ctx": 4096, 
+        #     "temperature": 1,                # gemma3 4b optimal settings (for now)
+        #     "top_k": 50, 
+        #     "top_p": 0.65
+        # },
         # "client": ChatOllama(num_ctx=4096, temperature=0.1, top_k=100, top_p=0.65),
         "response_generator": ollama_response,
         "system_prompt": OLLAMA_SYSTEM_PROMPT

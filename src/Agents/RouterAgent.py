@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from Models.model_config import ModelAdapter
+from Utils.utils import save_chat_history
 
 class ResponseFormat(BaseModel):
     agent: int = Field(..., description="The id of the agent")
@@ -16,7 +17,7 @@ You will be given a list of agents in the following format:
 [
     {0: {
         "name": "greeting_agent",
-        "description": "The greeting agent is responsible for greeting the user and introducing the travel agent. Do not use it for specific information"
+        "description": "The greeting agent is responsible for greeting the user and ONLY INTRODUCING the travel agent."
     },
     {1: {
         "name": "travel_agent",
@@ -30,16 +31,16 @@ When asked what your purpose is, you should respond with the id of the agent tha
 
 model = ModelAdapter(client_name="ollama", model="llama3.2", api_key="null")
 
-messages = [
-    {"role": "system", "content": SYSTEM_PROMPT},
-]
-
 class RouterAgent:
     def __init__(self, model: ModelAdapter = model):
         self.model = model
         self.model.client.format = ResponseFormat.model_json_schema()
 
-    def response(self, message: list) -> str:
-        messages.append({"role": "user", "content": message})
+    def response(self, message: str) -> str:
+        global SYSTEM_PROMPT
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": message}
+        ]
         response = self.model.response(messages)
         return ResponseFormat.model_validate_json(response).agent

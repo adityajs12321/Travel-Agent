@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from Models.model_config import ModelAdapter
-from agentic_patterns.planning_pattern.react_agent import ReactAgent
+from agentic_patterns.planning_pattern.react_agent_v2 import ReactAgent
 from agentic_patterns.tool_pattern.tool import tool
 from RAG.rag import RAG
 
@@ -86,11 +86,11 @@ class TravelAgent:
     def __init__(self, model: ModelAdapter = model):
         self.model = model
 
-    def response(self, message: str):
+    def response(self, messages: dict, conversation_id: str):
         react_agent = ReactAgent(tools_list, self.model, system_prompt=SYSTEM_PROMPT, add_constraints=self.model.add_constraints)
         response = react_agent.run(
-            conversation_id="6",
-            user_msg=message,
+            conversation_id=conversation_id,
+            messages=messages,
             max_rounds=10
         )
         return response

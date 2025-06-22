@@ -4,6 +4,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from Models.model_config import ModelAdapter
+from Utils.utils import save_chat_history
 
 model = ModelAdapter(client_name="ollama", model="llama3.2", api_key="null")
 
@@ -16,16 +17,17 @@ You simply state the purpose of the travel agent, which are as follows:
 - list the policies of the flight
 """
 
-messages = [
-    {"role": "system", "content": SYSTEM_PROMPT}
-]
 
 class GreetingAgent:
     def __init__(self, model: ModelAdapter = model):
         self.model = model
 
-    def response(self, message: str):
-        messages.append({"role": "user", "content": message})
-        response = model.response(messages=messages)
-        messages.append({"role": "assistant", "content": response})
+    def response(self, messages: dict, conversation_id: str):
+        global SYSTEM_PROMPT
+        current_messages = messages[conversation_id]
+        current_messages = [{"role": "system", "content": SYSTEM_PROMPT}] + current_messages
+        print(current_messages)
+        response = self.model.response(current_messages)
+        messages[conversation_id].append({"role": "assistant", "content": response})
+        save_chat_history(messages)
         return response

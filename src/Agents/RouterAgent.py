@@ -21,7 +21,7 @@ You will be given a list of agents in the following format:
     },
     {1: {
         "name": "travel_agent",
-        "description": "The travel agent is responsible for booking flights and policies"
+        "description": "The travel agent is responsible for booking flights and policies (everything else)"
     }
 ]
 Your response must be exactly one of the above options. Do not include anything else.

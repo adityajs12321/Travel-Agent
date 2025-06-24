@@ -1,7 +1,6 @@
 import sys
 import os
 import json
-from pydantic import BaseModel, Field
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -17,9 +16,7 @@ You are a travel agent that takes user input and calls the flight search tool ON
 You will then choose (choose NOT book) the best flight provided by the flights list and list the flight details only.
 
 Convert the origin and destination to their respective iataCode. DO NOT USE TOOL FOR IATA CODE.
-Both origin and destination are required.
-
-DO NOT USE MADE UP TOOLS.
+If either origin or destination is not given, DO NOT ASK THE USER FOR IT, fill them in the flight_search_tool as "NULL".
 
 Once you have the flight details, return it.
 
@@ -43,6 +40,11 @@ def flight_search_tool(
     # Go up to the common parent directory (src)
     parent_dir = os.path.dirname(current_dir)
 
+    if (originLocationCode == "NULL"):
+        return "ERROR : RETURN FINAL RESPONSE STATING THAT ORIGIN IS MISSING, WITHIN <response> </response> tag"
+    if (destinationLocationCode == "NULL"):
+        return "ERROR : RETURN FINAL RESPONSE STATING THAT DESTINATION IS MISSING, WITHIN <response> </response> tag"
+
     # Now navigate to the FlightData directory
     file_path = os.path.join(parent_dir, "FlightData", "Flights.json")
     with open(file_path, "r") as f:
@@ -51,7 +53,7 @@ def flight_search_tool(
         for flight in flights:
             if (flight["origin"] == originLocationCode and flight["destination"] == destinationLocationCode):
                 return flight
-        return "No flights found"
+        return "ERROR : No flights found"
     
 @tool
 def flight_policies_tool(

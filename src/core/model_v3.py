@@ -1,8 +1,5 @@
 import sys
 import os
-import json
-from pydantic import BaseModel, Field
-from pathlib import Path
 
 from colorama import Fore
 
@@ -14,7 +11,7 @@ from Agents.TravelAgent import TravelAgent
 from agentic_patterns.utils.completions import ChatHistory
 from Utils.utils import load_chat_history
 
-conversation_id = "0"
+conversation_id = "15"
 chat_history_ids = load_chat_history()
 
 AGENT_CONFIG = {
@@ -24,7 +21,7 @@ AGENT_CONFIG = {
 
 routing_agent = RouterAgent()
 
-message = "what is the baggage limit for economy class"
+message = "book a flight from chennai"
 
 if (chat_history_ids.get(conversation_id) == None):
     chat_history = ChatHistory(

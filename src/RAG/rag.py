@@ -10,7 +10,7 @@ from llama_index.core import (
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
 embed_model = HuggingFaceEmbedding(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",
+    model_name="/Users/adityajs/all-MiniLM-L6-v2",
     normalize=True,
 )
 

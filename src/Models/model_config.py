@@ -1,6 +1,6 @@
 from groq import Groq
 from google import genai
-from langchain_community.chat_models.ollama import ChatOllama
+from langchain_ollama import ChatOllama
 import lmstudio as lms
 from ollama import chat
 
@@ -79,7 +79,8 @@ def lmstudio_response(client, messages: list, model: str) -> str:
 MODEL_CONFIGS = {
     "groq": {
         "client_name": "groq",
-        "client": Groq(),
+        "client": Groq,
+        "client_settings": {},
         "response_generator": groq_response,
         "system_prompt": BASE_SYSTEM_PROMPT
     },
@@ -133,8 +134,11 @@ class ModelAdapter:
         self.client_name = client_name
         self.api_key = api_key
         self.model = model
-        self.client = MODEL_CONFIGS[client_name]["client"](**MODEL_CONFIGS[client_name]["client_settings"])
-        self.add_constraints = True
+        if (self.client_name == "ollama"):
+            self.client = MODEL_CONFIGS[client_name]["client"](model=model, **MODEL_CONFIGS[client_name]["client_settings"])
+        else: self.client = MODEL_CONFIGS[client_name]["client"](**MODEL_CONFIGS[client_name]["client_settings"])
+        
+        self.add_constraints = False
         if self.client_name == "groq":
             self.client.api_key = self.api_key
         elif self.client_name == "gemini":

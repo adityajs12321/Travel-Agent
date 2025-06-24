@@ -63,6 +63,9 @@ You then output:
 Additional constraints:
 
 - If the user asks you something unrelated to any of the tools above, say that you are strictly a travel agent and you can't help with that.
+- IF EITHER ORIGIN OR DESTINATION IF NOT GIVEN, JUST FILL THE MISSING FIELD WITH "NULL". DO NOT ASK THE USER FOR IT.
+- FOCUS ON THE LAST MESSAGE.
+- IF FINAL MESSAGE STARTS WITH ERROR, RETURN THE FINAL RESPONSE.
 """
 
 additional_constraints = "- You can answer greet and info responses, like 'Hello, how can I help you today?' or 'I'm here to help you with your travel plans."
@@ -166,7 +169,7 @@ class ReactAgent:
         for tool_call_str in tool_calls_content:
             tool_call = json.loads(tool_call_str)
             tool_name = tool_call["name"]
-            tool = self.tools_dict[tool_name]
+            tool = self.tools_dict.get(tool_name)
 
             print(Fore.GREEN + f"\nUsing Tool: {tool_name}")
 
@@ -189,6 +192,7 @@ class ReactAgent:
         conversation_id: str,
         messages: dict,
         max_rounds: int = 10,
+        summarise: bool = False
     ) -> str:
         """
         Executes a user interaction session, where the agent processes user input, generates responses,
@@ -217,14 +221,16 @@ class ReactAgent:
         messages[conversation_id][-1] = user_prompt
 
         # Summarising the context
-        if (len(messages[conversation_id]) >= 6):
-            _message = json.dumps(messages[conversation_id][1:-1])
-            summarisation_messages = [
-                {"role": "system", "content": "Your job is to summarise the user's input in about 100 words"},
-                {"role": "user", "content": _message}
-            ]
-            summarised_context = completions_create(self.client, summarisation_messages)
-            messages[conversation_id][1:-1] = [{"role": "assistant", "content": summarised_context}]
+
+        if (summarise):
+            if (len(messages[conversation_id]) >= 6):
+                _message = json.dumps(messages[conversation_id][1:-1])
+                summarisation_messages = [
+                    {"role": "system", "content": "Your job is to summarise the user's input in about 100 words"},
+                    {"role": "user", "content": _message}
+                ]
+                summarised_context = completions_create(self.client, summarisation_messages)
+                messages[conversation_id][1:-1] = [{"role": "assistant", "content": summarised_context}]
 
         if self.tools:
             # Run the ReAct loop for max_rounds

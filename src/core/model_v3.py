@@ -8,34 +8,27 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from Agents.RouterAgent import RouterAgent
 from Agents.GreetingAgent import GreetingAgent
 from Agents.TravelAgent import TravelAgent
-from agentic_patterns.utils.completions import ChatHistory
-from Utils.utils import load_chat_history
+from Agents.FlightPolicyAgent import FlightPolicyAgent
 
-conversation_id = "15"
-chat_history_ids = load_chat_history()
+conversation_id = "8"
 
 AGENT_CONFIG = {
     0: GreetingAgent(),
-    1: TravelAgent() 
+    1: TravelAgent(),
+    2: FlightPolicyAgent()
 }
 
-routing_agent = RouterAgent()
+routing_agent = RouterAgent(conversation_id)
 
-message = "book a flight from chennai"
+while (True):
+    message = input("> ")
+    if message == "exit":
+        break
 
-if (chat_history_ids.get(conversation_id) == None):
-    chat_history = ChatHistory(
-        [
-            {"role": "user", "content": message}
-        ]
-    )
-    chat_history_ids[conversation_id] = chat_history
-else: chat_history_ids[conversation_id].append({"role": "user", "content": message})
+    response = routing_agent.response(message)
 
-response = routing_agent.response(message)
+    print("\n" + str(response) + "\n")
 
-print("\n" + str(response) + "\n")
+    current_agent = AGENT_CONFIG[routing_agent.context.current_agent]
 
-current_agent = AGENT_CONFIG[response]
-
-print(Fore.GREEN + "\n\n" + current_agent.response(chat_history_ids, conversation_id))
+    print(Fore.GREEN + "\n\n" + current_agent.response(routing_agent.context))

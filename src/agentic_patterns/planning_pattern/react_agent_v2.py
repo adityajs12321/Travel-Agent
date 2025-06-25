@@ -1,11 +1,8 @@
 import json
-import re
 from typing import Union
-import os
 from pathlib import Path
 
 from colorama import Fore
-from groq import Groq
 
 from agentic_patterns.tool_pattern.tool import Tool
 from agentic_patterns.tool_pattern.tool import validate_arguments
@@ -63,9 +60,6 @@ You then output:
 Additional constraints:
 
 - If the user asks you something unrelated to any of the tools above, say that you are strictly a travel agent and you can't help with that.
-- IF EITHER ORIGIN OR DESTINATION IF NOT GIVEN, JUST FILL THE MISSING FIELD WITH "NULL". DO NOT ASK THE USER FOR IT.
-- FOCUS ON THE LAST MESSAGE.
-- IF FINAL MESSAGE STARTS WITH ERROR, RETURN THE FINAL RESPONSE.
 """
 
 additional_constraints = "- You can answer greet and info responses, like 'Hello, how can I help you today?' or 'I'm here to help you with your travel plans."

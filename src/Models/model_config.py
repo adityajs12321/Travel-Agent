@@ -44,7 +44,7 @@ def groq_response(client, messages: list, model: str) -> str:
     response = client.chat.completions.create(messages=messages, model=model)
     return str(response.choices[0].message.content)
 
-def gemini_response(client, messages: list, model: str) -> str:
+def gemini_response(client: genai.Client, messages: list, model: str, format=None) -> str:
     chat_history = []
     for message in messages[:len(messages) - 1]:
         chat_history.append(
@@ -62,8 +62,9 @@ def gemini_response(client, messages: list, model: str) -> str:
     response = chat.send_message(messages[-1]["content"])
     return response.text
 
-def ollama_response(client, messages: list, model: str) -> str:
+def ollama_response(client: ChatOllama, messages: list, model: str, format=None) -> str:
     client.model = model
+    client.format = format
     response = client.invoke(messages)
     if (model == "qwen3"):
         # return str(response.content)[19:]
@@ -148,5 +149,5 @@ class ModelAdapter:
             self.client.model = self.model
         self.system_prompt = MODEL_CONFIGS[client_name]["system_prompt"]
 
-    def response(self, messages: list) -> str:
-        return MODEL_CONFIGS[self.client_name]["response_generator"](self.client, messages, self.model)
+    def response(self, messages: list, format=None) -> str:
+        return MODEL_CONFIGS[self.client_name]["response_generator"](self.client, messages, self.model, format)

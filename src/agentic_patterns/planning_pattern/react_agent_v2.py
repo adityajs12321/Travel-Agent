@@ -186,7 +186,8 @@ class ReactAgent:
         conversation_id: str,
         messages: dict,
         max_rounds: int = 10,
-        summarise: bool = False
+        summarise: bool = False,
+        save_file: bool = True
     ) -> str:
         """
         Executes a user interaction session, where the agent processes user input, generates responses,
@@ -236,7 +237,7 @@ class ReactAgent:
                 if response.found:
                     messages[conversation_id] = messages[conversation_id][1:]
                     messages[conversation_id] = ChatHistory(messages[conversation_id])
-                    save_chat_history(messages)
+                    if (save_file): save_chat_history(messages)
                     return response.content[0]
 
                 thought = extract_tag_content(str(completion), "thought")
@@ -255,5 +256,5 @@ class ReactAgent:
         # Save chat history after each interaction
         messages[conversation_id] = messages[conversation_id][1:]
         messages[conversation_id] = ChatHistory(messages[conversation_id])
-        save_chat_history(messages)
+        if (save_file): save_chat_history(messages)
         return completions_create(self.client, messages[conversation_id])

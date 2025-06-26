@@ -16,6 +16,9 @@ model = ModelAdapter(client_name="ollama", model="gemma3:4b", api_key="null")
 
 SYSTEM_PROMPT = """
 You are a travel agent that takes in agent context and calls flight_search_tool by filling it with the agent context.
+
+If the user books a new flight, just look it up using flight_search_tool and don't do anythign stupid.
+If either origin or destination is mentioned, use the context to figure out the most likely value.
 """
 
 SYSTEM_PROMPT_OLD = """
@@ -64,7 +67,7 @@ def flight_search_tool(
         flights = data["Flights"]
         for flight in flights:
             if (flight["origin"] == originLocationCode and flight["destination"] == destinationLocationCode):
-                return flight
+                return {'FLIGHT DETAILS LISTED': flight}
         return "ERROR : No flights found"
 
 
@@ -84,7 +87,7 @@ class TravelAgent:
         agent_context_params = self.model.response(temp_messages, AgentContext.model_json_schema())
         agent_context_params = AgentContext.model_validate_json(agent_context_params)
         context.agent_context = dict(agent_context_params)
-        # print(agent_context)
+        print(context.agent_context)
         for key in context.agent_context.keys():
             if (context.agent_context[key] == "NULL"):
                 temp_messages.append({"role": "user", "content": f"{key} is missing, ask user to fill it"})
@@ -92,8 +95,9 @@ class TravelAgent:
                 temp_messages.append({"role": "assistant", "content": response})
                 return response
         
+        
         _messages = context.history
-        index = len(_messages[context.conversation_id])
+        # index = len(_messages[context.conversation_id])
         _messages[context.conversation_id] = _messages[context.conversation_id] + [{"role": "user", "content": f"Agent Context: {context.agent_context}"}]
         react_agent = ReactAgent(tools_list, self.model, system_prompt=SYSTEM_PROMPT, add_constraints=self.model.add_constraints)
         response = react_agent.run(
@@ -101,5 +105,7 @@ class TravelAgent:
             messages=_messages,
             max_rounds=10
         )
-        del _messages[context.conversation_id][index]
+        # del _messages[context.conversation_id][index]
+        context.agent_context = {}
+        temp_messages[1:] = []
         return response

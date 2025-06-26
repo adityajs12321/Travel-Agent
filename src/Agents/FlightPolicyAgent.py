@@ -7,12 +7,20 @@ from Models.model_config import ModelAdapter
 from agentic_patterns.planning_pattern.react_agent_v2 import ReactAgent
 from agentic_patterns.tool_pattern.tool import tool
 from RAG.rag import RAG
+from RAG.dynamic_context import load_context
 from Agents.RouterAgent import Context
+import copy
+from Utils.utils import save_chat_history
+from agentic_patterns.utils.completions import build_prompt_structure
 
 model = ModelAdapter(client_name="ollama", model="gemma3:4b", api_key="null")
 
 SYSTEM_PROMPT = """
 If the user asks for the details or policies of the flight (meals, baggage, etc.), you will use the flight_policies_tool to search for the policies and return the relevant policies according to the user's query verbatim.
+You will then reframe the policies to answer the user's query.
+
+Final response should be wrapped in <response></response> tag.
+PLEASE ONLY FOCUS ON THE LAST <question>.
 """
 
 SYSTEM_PROMPT_OLD = """
@@ -65,9 +73,19 @@ class FlightPolicyAgent:
 
     def response(self, context: Context):
         react_agent = ReactAgent(tools_list, self.model, system_prompt=SYSTEM_PROMPT, add_constraints=self.model.add_constraints)
+        _messages = copy.deepcopy(context.history)
+        _messages[context.conversation_id] = load_context(context)
+
+        user_prompt = build_prompt_structure(
+            prompt=context.history[context.conversation_id][-1]["content"], role="user", tag="question"
+        )
+        context.history[context.conversation_id][-1] = user_prompt
+
         response = react_agent.run(
             conversation_id=context.conversation_id,
-            messages=context.history,
+            messages=_messages,
             max_rounds=10
         )
+        # context.history[context.conversation_id].append({"role": "user", "content": response})
+        save_chat_history(context.history)
         return response

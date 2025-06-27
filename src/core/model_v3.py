@@ -18,17 +18,34 @@ AGENT_CONFIG = {
     2: FlightPolicyAgent()
 }
 
-routing_agent = RouterAgent(conversation_id)
+routing_agent = None
 
-while (True):
-    message = input("> ")
-    if message == "exit":
-        break
+# while (True):
+#     message = input("> ")
+#     if message == "exit":
+#         break
 
+#     response = routing_agent.response(message)
+
+#     print("\n" + str(response) + "\n")
+
+#     current_agent = AGENT_CONFIG[routing_agent.context.current_agent]
+
+#     print(Fore.GREEN + "\n\n" + current_agent.response(routing_agent.context))
+
+def set_router_agent(conversation_id: str, client):
+    global routing_agent
+    routing_agent = RouterAgent(conversation_id, client)
+
+def trip_planning(message: str, client):
     response = routing_agent.response(message)
 
     print("\n" + str(response) + "\n")
 
+    global AGENT_CONFIG
     current_agent = AGENT_CONFIG[routing_agent.context.current_agent]
+    current_agent.model = client
 
-    print(Fore.GREEN + "\n\n" + current_agent.response(routing_agent.context))
+    final_response = current_agent.response(routing_agent.context)
+    print(Fore.GREEN + "\n\n" + final_response)
+    return final_response

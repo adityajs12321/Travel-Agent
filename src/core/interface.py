@@ -5,17 +5,18 @@ import model_v2
 import os
 import uuid
 from Models.model_config import ModelAdapter
+from model_v3 import set_router_agent, trip_planning
 
 response = ""
 
 app = FastAPI()
 
-id = None
-default_val = 10
+prev_id, id = None, None
 
 _client_name = ""
 _model = ""
 _api_key = ""
+client: ModelAdapter
 
 class TripPreferences(BaseModel):
     """Hotel preferences model containing distance from airport and ratings criteria."""
@@ -61,9 +62,38 @@ def model_type(client_name: str, model: str, api_key: str = ""):
     global _client_name
     global _model
     global _api_key
+    global client
     _client_name = client_name
     _model = model
     _api_key = api_key
+    client = ModelAdapter(client_name=client_name, model=model, api_key=api_key)
+
+
+# model_v2
+# @app.post("/ask")
+# def trip_request(request: str, conversation_id: str = id):
+#     """
+#     Handles trip planning requests.
+    
+#     Args:
+#         request (str): Trip planning query string
+        
+#     Returns:
+#         str: Trip planning response
+#     """
+
+#     global id
+#     id = uuid.uuid1() if conversation_id is None else conversation_id
+#     _conversation_id = conversation_id if conversation_id is not None else id
+#     global _client_name, _model, _api_key
+#     client = ModelAdapter(client_name=_client_name, model=_model, api_key=_api_key)
+#     global response
+#     model = IntelTravelModel()
+#     response = model.trip_planning(_conversation_id, request, client)
+#     return {
+#         "Response": response,
+#         "Conversation ID": _conversation_id
+#     }
 
 @app.post("/ask")
 def trip_request(request: str, conversation_id: str = id):
@@ -77,14 +107,14 @@ def trip_request(request: str, conversation_id: str = id):
         str: Trip planning response
     """
 
-    global id
-    id = uuid.uuid1() if conversation_id is None else conversation_id
+    global client, id, prev_id
+
+    id = uuid.uuid4() if conversation_id is None else conversation_id
     _conversation_id = conversation_id if conversation_id is not None else id
-    global _client_name, _model, _api_key
-    client = ModelAdapter(client_name=_client_name, model=_model, api_key=_api_key)
-    global response
-    model = IntelTravelModel()
-    response = model.trip_planning(_conversation_id, request, client)
+    if (prev_id != id): set_router_agent(_conversation_id, client)
+    prev_id = id
+
+    response = trip_planning(request, client)
     return {
         "Response": response,
         "Conversation ID": _conversation_id

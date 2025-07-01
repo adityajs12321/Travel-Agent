@@ -12,7 +12,7 @@ def completions_create(model, messages: list) -> str:
     Returns:
         str: The content of the model's response.
     """
-    print(messages)
+    print("COMPLETIONS_CREATE:", messages)
     return model.response(messages)
 
 

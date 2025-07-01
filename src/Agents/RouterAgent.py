@@ -59,7 +59,11 @@ You will be given a list of agents in the following format:
     },
     {2: {
         "name": "flight_details_agent",
-        "description": "Handles details and policies of a chosen flight (e.g., baggage, meals, check-in, refund process, services)."
+        "description": "Handles details and policies of a chosen flight (e.g., baggage, in-flight meals, check-in, refund process, services)."
+    },
+    {3: {
+        "name": "restaurant_agent",
+        "description": Handles hotels and restaurant suggestions and the meals available in there.
     }
 ]
 Your response must be exactly one of the above options. Do not include anything else.
@@ -85,7 +89,18 @@ class RouterAgent:
         else: self.context.history[self.context.conversation_id].append({"role": "user", "content": message})
 
         global SYSTEM_PROMPT
-        messages = [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": message}]
-        response = self.model.response(messages, format=ResponseFormat.model_json_schema())
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        i, count = 2, 1
+        temp_list = [{"role": "user", "content": message}]
+        while (i <= len(self.context.history[self.context.conversation_id])):
+            if (self.context.history[self.context.conversation_id][-i]['content'][:10] == "<question>"):
+                count += 1
+                # temp_list.append({"role": "assistant", "content": ""})
+                temp_list.append(self.context.history[self.context.conversation_id][-i])
+            i += 1
+            if (count >= 2): break
+        messages.extend(temp_list[::-1])
+        print("\n\n Router Messages: ", messages, "\n\n")
+        response = self.model.response(messages, format=ResponseFormat)
         self.context.current_agent = ResponseFormat.model_validate_json(response).agent
         return self.context.current_agent

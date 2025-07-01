@@ -245,6 +245,7 @@ class ReactAgent:
 
                 update_chat_history(messages[conversation_id], completion, "assistant")
 
+
                 if (thought.found): print(Fore.MAGENTA + f"\nThought: {thought.content[0]}")
 
                 if tool_calls.found:
@@ -252,6 +253,11 @@ class ReactAgent:
                     print(Fore.BLUE + f"\nObservations: {observations}")
                     update_chat_history(messages[conversation_id], f"{observations}", "user")
                     # chat_history_ids[conversation_id].append(user_prompt)
+                if (messages[conversation_id][-1]["role"] == "assistant"):
+                    messages[conversation_id] = messages[conversation_id][1:]
+                    messages[conversation_id] = ChatHistory(messages[conversation_id])
+                    if (save_file): save_chat_history(messages)
+                    return messages[conversation_id][-1]["content"]
 
         # Save chat history after each interaction
         messages[conversation_id] = messages[conversation_id][1:]

@@ -57,14 +57,17 @@ def gemini_response(client: genai.Client, messages: list, model: str, format=Non
                 ]
             }
         )
-    print(chat_history)
-    chat = client.chats.create(model=model, history=chat_history)
+    # print(chat_history)
+    config = {}
+    if (format != None): config = {"response_mime_type": "application/json", "response_schema": format}
+    print(format)
+    chat = client.chats.create(model=model, history=chat_history, config=config)
     response = chat.send_message(messages[-1]["content"])
     return response.text
 
 def ollama_response(client: ChatOllama, messages: list, model: str, format=None) -> str:
     client.model = model
-    client.format = format
+    client.format = format.model_json_schema() if (format != None) else None
     response = client.invoke(messages)
     if (model == "qwen3"):
         # return str(response.content)[19:]
@@ -87,7 +90,8 @@ MODEL_CONFIGS = {
     },
     "gemini": {
         "client_name": "gemini",
-        "client": genai.Client(),
+        "client": genai.Client,
+        "client_settings": {},
         "response_generator": gemini_response,
         "system_prompt": BASE_SYSTEM_PROMPT
     },

@@ -1,0 +1,113 @@
+{
+    "MAA": [
+      {
+        "name": "The Leela Palace",
+        "rating": 4.7,
+        "price_per_night": 12000,
+        "meals_available": {
+          "breakfast": ["idli", "dosa", "upma", "fresh juice", "coffee"],
+          "lunch": ["vegetable biryani", "chicken chettinad", "rasam", "curd rice"],
+          "dinner": ["paneer butter masala", "naan", "fish curry", "lemon rice"],
+          "buffet": ["assorted Indian breads", "dal makhani", "tandoori chicken", "salads", "desserts"]
+        }
+      },
+      {
+        "name": "Taj Club House",
+        "rating": 4.5,
+        "price_per_night": 8500,
+        "meals_available": {
+          "breakfast": ["medu vada", "pongal", "toast", "tea"],
+          "dinner": ["mutton curry", "ghee rice", "vegetable stew", "appam"]
+        }
+      }
+    ],
+    "BLR": [
+      {
+        "name": "The Oberoi Bengaluru",
+        "rating": 4.8,
+        "price_per_night": 13000,
+        "meals_available": {
+          "breakfast": ["masala dosa", "idli-vada", "fruit bowl", "coffee"],
+          "lunch": ["bisi bele bath", "chicken curry", "rice", "sambhar"],
+          "dinner": ["paneer tikka", "butter naan", "veg pulao", "dal fry"],
+          "buffet": ["continental salad", "south Indian delicacies", "grilled meats", "dessert bar"]
+        }
+      },
+      {
+        "name": "ITC Gardenia",
+        "rating": 4.6,
+        "price_per_night": 11000,
+        "meals_available": {
+          "breakfast": ["rava idli", "cornflakes", "milk", "fresh fruit"],
+          "dinner": ["kofta curry", "jeera rice", "naan", "tandoori mushrooms"]
+        }
+      }
+    ],
+    "TRV": [
+      {
+        "name": "Hilton Garden Inn",
+        "rating": 4.4,
+        "price_per_night": 7500,
+        "meals_available": {
+          "breakfast": ["puttu", "kadala curry", "boiled eggs", "banana chips"],
+          "lunch": ["fish molee", "rice", "avial", "sambhar"]
+        }
+      },
+      {
+        "name": "Taj Green Cove Resort & Spa",
+        "rating": 4.7,
+        "price_per_night": 14000,
+        "meals_available": {
+          "breakfast": ["appam", "egg roast", "idiyappam", "filter coffee"],
+          "lunch": ["kerala sadya", "meen curry", "pachadi", "pickle"],
+          "dinner": ["malabar parotta", "korma", "rice", "thoran"]
+        }
+      }
+    ],
+    "DEL": [
+      {
+        "name": "The Imperial New Delhi",
+        "rating": 4.7,
+        "price_per_night": 15000,
+        "meals_available": {
+          "breakfast": ["paratha", "lassi", "chana masala", "toast"],
+          "lunch": ["dal makhani", "butter chicken", "jeera rice", "naan"],
+          "dinner": ["rogan josh", "paneer lababdar", "missi roti", "raita"],
+          "buffet": ["live pasta counter", "Indian mains", "Asian stir fry", "desserts"]
+        }
+      },
+      {
+        "name": "Shangri-La Eros",
+        "rating": 4.6,
+        "price_per_night": 12500,
+        "meals_available": {
+          "breakfast": ["puri bhaji", "eggs to order", "croissants", "juice"],
+          "dinner": ["chicken tikka masala", "biryani", "dal tadka", "naan"]
+        }
+      }
+    ],
+    "BOM": [
+      {
+        "name": "The Taj Mahal Palace",
+        "rating": 4.9,
+        "price_per_night": 18000,
+        "meals_available": {
+          "breakfast": ["poha", "misal pav", "croissants", "cold cuts"],
+          "lunch": ["goan fish curry", "rice", "bombay sandwich", "salads"],
+          "dinner": ["butter chicken", "pav bhaji", "veg kolhapuri", "naan"],
+          "buffet": ["international cuisine", "chaat counter", "seafood", "dessert platter"]
+        }
+      },
+      {
+        "name": "Trident Nariman Point",
+        "rating": 4.6,
+        "price_per_night": 11000,
+        "meals_available": {
+          "breakfast": ["upma", "fruit salad", "omelette", "smoothies"],
+          "lunch": ["mutton rogan josh", "basmati rice", "bhindi fry", "roti"],
+          "dinner": ["kadhai paneer", "naan", "chicken stew", "veg biryani"]
+        }
+      }
+    ]
+  }
+  

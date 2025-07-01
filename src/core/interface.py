@@ -109,10 +109,14 @@ def trip_request(request: str, conversation_id: str = id):
 
     global client, id, prev_id
 
-    id = uuid.uuid4() if conversation_id is None else conversation_id
+    id = str(uuid.uuid4()) if conversation_id is None else conversation_id
     _conversation_id = conversation_id if conversation_id is not None else id
-    if (prev_id != id): set_router_agent(_conversation_id, client)
-    prev_id = id
+
+    print(prev_id, ", ", id)
+    if (prev_id != _conversation_id): 
+        set_router_agent(_conversation_id, client)
+        print("\n\nInitialised router agent\n\n")
+        prev_id = _conversation_id
 
     response = trip_planning(request, client)
     return {

@@ -1,0 +1,170 @@
+{
+    "MAA": [
+        {
+          "name": "Mahabalipuram Shore Temple Complex",
+          "type": "Historical Site/UNESCO World Heritage",
+          "description": "Ancient rock-cut temples and monolithic sculptures.",
+          "best_for": ["History", "Architecture", "Photography"],
+          "estimated_time": "3-4 hours (excluding travel)",
+          "notes": "Located about 60 km south of Chennai. Day trip recommended."
+        },
+        {
+          "name": "Marina Beach",
+          "type": "Beach",
+          "description": "One of the longest urban beaches in the world, great for evening strolls and local snacks.",
+          "best_for": ["Relaxation", "Food", "Sunset views"],
+          "estimated_time": "1-2 hours"
+        },
+        {
+          "name": "DakshinaChitra",
+          "type": "Living History Museum",
+          "description": "Showcases the art, architecture, lifestyles, crafts and performing arts of South India.",
+          "best_for": ["Culture", "Art", "Families"],
+          "estimated_time": "2-3 hours",
+          "notes": "Located on the East Coast Road."
+        }
+    ],
+    "TRV": [
+        {
+          "name": "Padmanabhaswamy Temple",
+          "type": "Temple/Historical Site",
+          "description": "An ancient Hindu temple dedicated to Lord Vishnu, famous for its intricate architecture and spiritual significance.",
+          "best_for": ["Spirituality", "Architecture", "History"],
+          "estimated_time": "1-2 hours",
+          "notes": "Strict dress code applies. Non-Hindus may have restricted access to inner sanctum."
+        },
+        {
+          "name": "Napier Museum and Zoo",
+          "type": "Museum/Zoo",
+          "description": "An art and natural history museum built in the Indo-Saracenic style, adjacent to a well-maintained zoo.",
+          "best_for": ["Families", "History", "Nature"],
+          "estimated_time": "2-3 hours"
+        },
+        {
+          "name": "Poovar Island",
+          "type": "Backwater/Beach Destination",
+          "description": "An estuary where river, lake, sea, and backwaters meet, offering unique boat rides.",
+          "best_for": ["Nature", "Boating", "Photography"],
+          "estimated_time": "Half-day trip",
+          "notes": "About 30 km from city center. Known for golden sand beach and floating restaurants."
+        },
+        {
+          "name": "Shanghumugham Beach",
+          "type": "Beach",
+          "description": "A city beach known for its beautiful sunset views and the sculpture of a mermaid (Matsya Kanyaka).",
+          "best_for": ["Sunset views", "Strolls", "Relaxation"],
+          "estimated_time": "1-2 hours"
+        }
+    ],
+    "BLR": [
+        {
+          "name": "Lalbagh Botanical Garden",
+          "type": "Botanical Garden",
+          "description": "A famous botanical garden with a glass house inspired by London's Crystal Palace, diverse plant species.",
+          "best_for": ["Nature", "Photography", "Relaxation"],
+          "estimated_time": "2-3 hours"
+        },
+        {
+          "name": "Cubbon Park",
+          "type": "Urban Park",
+          "description": "A sprawling green space in the heart of the city, ideal for walks, jogging, and enjoying nature.",
+          "best_for": ["Relaxation", "Nature", "Walks"],
+          "estimated_time": "1-2 hours"
+        },
+        {
+          "name": "Bangalore Palace",
+          "type": "Historical Palace",
+          "description": "An opulent palace built in Tudor style, inspired by Windsor Castle.",
+          "best_for": ["History", "Architecture", "Photography"],
+          "estimated_time": "1.5-2 hours"
+        },
+        {
+          "name": "UB City",
+          "type": "Luxury Mall/Dining",
+          "description": "Bengaluru's first luxury mall, offering high-end brands, fine dining, and entertainment.",
+          "best_for": ["Luxury Shopping", "Fine Dining", "Nightlife"],
+          "estimated_time": "2-4 hours"
+        }
+    ],
+    "BOM": [
+        {
+          "name": "Gateway of India",
+          "type": "Historical Monument/Landmark",
+          "description": "An iconic arch monument built to commemorate the visit of King George V and Queen Mary.",
+          "best_for": ["History", "Photography", "Sightseeing"],
+          "estimated_time": "1-1.5 hours"
+        },
+        {
+          "name": "Marine Drive (Queen's Necklace)",
+          "type": "Promenade/Seaside",
+          "description": "A picturesque boulevard along the Arabian Sea, famous for its stunning cityscape view, especially at night.",
+          "best_for": ["Evening Strolls", "Sunset views", "Relaxation"],
+          "estimated_time": "1-2 hours"
+        },
+        {
+          "name": "Chhatrapati Shivaji Maharaj Vastu Sangrahalaya (CSMVS)",
+          "type": "Museum",
+          "description": "One of India's premier art and history museums, housing diverse collections.",
+          "best_for": ["History", "Art", "Culture"],
+          "estimated_time": "2-3 hours"
+        },
+        {
+          "name": "Elephanta Caves",
+          "type": "UNESCO World Heritage Site/Caves",
+          "description": "A network of sculpted cave temples located on Elephanta Island, accessible by ferry.",
+          "best_for": ["History", "Spirituality", "Adventure (ferry ride)"],
+          "estimated_time": "Half-day trip (including ferry)"
+        },
+        {
+          "name": "Colaba Causeway",
+          "type": "Shopping Street/Market",
+          "description": "A bustling street market offering everything from clothes and jewelry to souvenirs and street food.",
+          "best_for": ["Shopping", "Local Experience", "Food"],
+          "estimated_time": "2-3 hours"
+        }
+    ],
+    "DEL": [
+        {
+          "name": "India Gate",
+          "type": "War Memorial/Landmark",
+          "description": "A prominent landmark dedicated to Indian soldiers, surrounded by lush lawns.",
+          "best_for": ["Photography", "Evening strolls", "Patriotism"],
+          "estimated_time": "1-1.5 hours"
+        },
+        {
+          "name": "Qutub Minar",
+          "type": "UNESCO World Heritage Site/Minaret",
+          "description": "A soaring 73-meter high tower of victory, part of the Qutub complex with ancient ruins.",
+          "best_for": ["History", "Architecture", "Photography"],
+          "estimated_time": "1.5-2 hours"
+        },
+        {
+          "name": "Humayun's Tomb",
+          "type": "UNESCO World Heritage Site/Tomb",
+          "description": "The tomb of the Mughal Emperor Humayun, often considered a precursor to the Taj Mahal.",
+          "best_for": ["History", "Architecture", "Gardens"],
+          "estimated_time": "1.5-2 hours"
+        },
+        {
+          "name": "Red Fort (Lal Qila)",
+          "type": "UNESCO World Heritage Site/Fort",
+          "description": "A historic fort in Old Delhi, served as the main residence of the Mughal Emperors.",
+          "best_for": ["History", "Architecture", "Culture"],
+          "estimated_time": "2-3 hours"
+        },
+        {
+          "name": "Chandni Chowk",
+          "type": "Historic Market/Food Street",
+          "description": "One of the oldest and busiest markets in Old Delhi, famous for its diverse street food and wholesale goods.",
+          "best_for": ["Food", "Shopping", "Local Experience"],
+          "estimated_time": "2-4 hours"
+        },
+        {
+          "name": "Hauz Khas Village",
+          "type": "Urban Village/Historical Complex",
+          "description": "A historic complex with ruins, a lake, and a trendy area with cafes, bars, and boutiques.",
+          "best_for": ["Leisure", "Dining", "Nightlife", "Photography"],
+          "estimated_time": "2-3 hours (more for dining/nightlife)"
+        }
+    ]
+  }

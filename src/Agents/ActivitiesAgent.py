@@ -9,11 +9,14 @@ from Models.model_config import ModelAdapter
 from agentic_patterns.planning_pattern.react_agent_v2 import ReactAgent
 from agentic_patterns.tool_pattern.tool import tool
 from RAG.rag import RAG
-from RAG.dynamic_context import load_restaurant_context
+from RAG.dynamic_context import load_activities_context
 from Agents.RouterAgent import Context
 import copy
 from Utils.utils import save_chat_history
 from agentic_patterns.utils.completions import build_prompt_structure
+
+class NewRequest(BaseModel):
+    new_request: int = Field(..., description="The id of the agent")
 
 model = ModelAdapter(client_name="ollama", model="gemma3:4b", api_key="null")
 
@@ -26,24 +29,21 @@ FOCUS ON THE LAST MESSAGE
 """
 
 SYSTEM_PROMPT_NEW_REQUEST = """
-Your job is to identify whether the user is asking for new hotel suggestions or questions regarding a hotel already chosen and the choose the appropriate agent.
+Your job is to identify whether the user is asking for new local activities suggestions or questions regarding a activity or tourist spot already chosen and then choose the appropriate agent.
 {
-    1: new_hotel_request_agent,
-    2: existing_hotel_request_agent
+    1: new_activities_request_agent,
+    2: existing_activity_request_agent
 }
 """
 
-class NewRequest(BaseModel):
-    new_request: int = Field(..., description="The id of the agent")
-
-hotel_list = []
+activities_list = []
     
 @tool
-def hotel_search_tool(
+def activities_search_tool(
     destinationLocationCode: str
 ):
     """
-        Gets the hotels nearby the destination and returns the price, rating and meals available.
+        Gets the local activities in the destination and returns its description among other things.
 
         Args:
             destinationLocationCode (str): The destination in iataCode
@@ -54,36 +54,38 @@ def hotel_search_tool(
     parent_dir = os.path.dirname(current_dir)
 
     # Now navigate to the FlightData directory
-    file_path = os.path.join(parent_dir, "RestaurantData", "Restaurants.json")
+    file_path = os.path.join(parent_dir, "ActivitiesData", "Activities.json")
     with open(file_path, "r") as f:
         data = json.load(f)
-        hotels = data[destinationLocationCode]
-        global hotel_list
-        hotel_list = {destinationLocationCode: hotels}
-        return hotel_list
+        activities = data[destinationLocationCode]
+        global activities_list
+        activities_list = {destinationLocationCode: activities}
+        return activities_list
 
-tools_list = [hotel_search_tool]
+tools_list = [activities_search_tool]
 
-current_hotel = {}
+current_activity = {}
 
 temp_messages = [{"role": "system", "content": SYSTEM_PROMPT_NEW_REQUEST}]
 
-class RestaurantAgent:
+class ActivitiesAgent:
     def __init__(self, model: ModelAdapter = model):
         self.model = model
 
     def response(self, context: Context):
-        global current_hotel
+        global current_activity, activities_list
+
         temp_messages.append(context.history[context.conversation_id][-1])
         response = self.model.response(temp_messages, NewRequest)
         new_request = NewRequest.model_validate_json(response).new_request
         print("\nrestaurant agent response", new_request, "\n")
+        if (new_request == 1): activities_list = []
 
         react_agent = ReactAgent(tools_list, self.model, system_prompt=SYSTEM_PROMPT, add_constraints=self.model.add_constraints)
         _messages = copy.deepcopy(context.history)
-        global hotel_list
-        _messages[context.conversation_id] = load_restaurant_context(context, current_hotel, hotel_list)
-        print(f"\n\n Hotel List: {json.dumps(hotel_list)}\n\n")
+
+        _messages[context.conversation_id] = load_activities_context(context, current_activity, activities_list)
+        print(f"\n\n Hotel List: {json.dumps(activities_list)}\n\n")
 
         user_prompt = build_prompt_structure(
             prompt=context.history[context.conversation_id][-1]["content"], role="user", tag="question"
@@ -95,10 +97,10 @@ class RestaurantAgent:
             messages=_messages,
             max_rounds=10
         )
-        if (hotel_list != []): context.history[context.conversation_id].append({"role": "user", "content": f"Hotel List: {json.dumps(hotel_list)}"})
+        if (activities_list != []): context.history[context.conversation_id].append({"role": "user", "content": f"Activities List: {json.dumps(activities_list)}"})
         
 
-        current_hotel = {"role": "assistant", "content": response}
-        context.history[context.conversation_id].append(current_hotel)
+        current_activity = {"role": "assistant", "content": response}
+        context.history[context.conversation_id].append(current_activity)
         save_chat_history(context.history)
         return response

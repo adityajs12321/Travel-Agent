@@ -11,6 +11,7 @@ from agentic_patterns.planning_pattern.react_agent_v2 import ReactAgent
 from agentic_patterns.tool_pattern.tool import tool
 from RAG.rag import RAG
 from Agents.RouterAgent import Context
+from Utils.utils import save_chat_history
 
 model = ModelAdapter(client_name="ollama", model="gemma3:4b", api_key="null")
 
@@ -92,7 +93,13 @@ def flight_search_tool(
 
 tools_list = [flight_search_tool]
 
-temp_messages = [{"role": "system", "content": "You are required to extract the origin and destination airport code from the user input. Fill the missing values with 'NULL'"}]
+TEMP_SYSTEM_PROMPT = """
+You are required to extract the origin and destination airport code from the user input. Fill the missing values with 'NULL'. 
+
+If the user asks for something unrelated to your task, SAY THAT YOU ARE STRICTLY A TRAVEL AGENT AND CANNOT HELP WITH THAT.
+"""
+
+temp_messages = [{"role": "system", "content": TEMP_SYSTEM_PROMPT}]
 
 class TravelAgent:
     def __init__(self, model: ModelAdapter = model):
@@ -117,14 +124,17 @@ class TravelAgent:
         
         _messages = context.history
         # index = len(_messages[context.conversation_id])
-        _messages[context.conversation_id] = _messages[context.conversation_id] + [{"role": "user", "content": f"Agent Context: {context.agent_context}"}]
+        _messages[context.conversation_id] = [_messages[context.conversation_id][-1]] + [{"role": "user", "content": f"Agent Context: {context.agent_context}"}]
         react_agent = ReactAgent(tools_list, self.model, system_prompt=SYSTEM_PROMPT if self.model.client_name == "gemini" else SYSTEM_PROMPT_GEMMA, add_constraints=self.model.add_constraints)
         response = react_agent.run(
             conversation_id=context.conversation_id,
             messages=_messages,
-            max_rounds=2
+            max_rounds=2,
+            save_file=False
         )
         # del _messages[context.conversation_id][index]
+        context.history[context.conversation_id].append({"role": "assistant", "content": response})
+        save_chat_history(context.history)
         context.agent_context = {}
         temp_messages[1:] = []
         return response

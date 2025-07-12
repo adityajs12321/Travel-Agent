@@ -62,6 +62,7 @@ class AgentContext(BaseModel):
 def flight_search_tool(
     originLocationCode: str,
     destinationLocationCode: str,
+    departureDate: str
 ):
     """
         Gets the flight details provided the given details.
@@ -69,6 +70,7 @@ def flight_search_tool(
         Args:
             originLocationCode (str): The origin airport code
             destinationLocationCode (str): The destination airport code
+            departureDate (str): The departure date in YYYY-MM-DD format
         """
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -86,7 +88,7 @@ def flight_search_tool(
         data = json.load(f)
         flights = data["Flights"]
         for flight in flights:
-            if (flight["origin"] == originLocationCode and flight["destination"] == destinationLocationCode):
+            if (flight["origin"] == originLocationCode and flight["destination"] == destinationLocationCode and flight["departureDate"] == departureDate):
                 return {'FLIGHT DETAILS LISTED': flight}
         return "ERROR : No flights found"
 

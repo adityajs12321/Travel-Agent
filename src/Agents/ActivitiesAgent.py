@@ -21,11 +21,12 @@ class NewRequest(BaseModel):
 model = ModelAdapter(client_name="ollama", model="gemma3:4b", api_key="null")
 
 SYSTEM_PROMPT = """
-You are a hotel agent that uses the hotel_search_tool and finds the best hotel near the destination.
-If user asks for anything specific about a hotel, like meals available in there, use the tool and answer accordingly.
+You are a local activities agent that uses the activities_search_tool and finds the best activities or tourist spots near the destination.
+If user asks for anything specific about an activity, use the tool and answer accordingly.
 
-If hotel is already chosen, refer to that for further questions, no need to call any tool.
-FOCUS ON THE LAST MESSAGE
+If activity is already chosen, refer to that for further questions, no need to call any tool.
+FOCUS ON THE LAST MESSAGE.
+IGNORE QUESTIONS UNRELATED TO YOUR TASK.
 """
 
 SYSTEM_PROMPT_NEW_REQUEST = """

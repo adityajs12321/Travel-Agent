@@ -13,6 +13,7 @@ from Agents.RestaurantAgent import RestaurantAgent
 from Agents.ActivitiesAgent import ActivitiesAgent
 from Models.model_config import ModelAdapter
 from Utils.utils import load_chat_history
+from api_utils.AmadeusAPI import AmadeusClient
 import asyncio
 
 # temp_chat_history = load_chat_history()
@@ -20,14 +21,14 @@ import asyncio
 # last_conv_id = list(temp_chat_history.keys())[-1]
 
 # conversation_id = int(last_conv_id) + 1
-conversation_id = "9"
+conversation_id = "0"
 
-
+amadeus_client = AmadeusClient(os.getenv("AMADEUS_CLIENT_ID"), os.getenv("AMADEUS_CLIENT_SECRET"))
 _client = ModelAdapter(client_name="gemini", model="gemini-2.5-flash", api_key=os.getenv("GEMINI_API_KEY"))
 
 AGENT_CONFIG = {
     0: GreetingAgent(_client),
-    1: TravelAgent(_client),
+    1: TravelAgent(amadeus_client=amadeus_client, model=_client),
     2: FlightPolicyAgent(_client),
     3: RestaurantAgent(_client),
     4: ActivitiesAgent(_client)

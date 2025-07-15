@@ -31,19 +31,6 @@ def set_access_token(client_id, client_secret):
         print(f"Client failed to connect: {e}")
         client = None
 
-class TripPreferences(BaseModel):
-    distance_from_airport: str
-    ratings: str
-
-class TripRequest(BaseModel):
-    origin: str = Field(..., description="Departure city/airport code")
-    destination: str = Field(..., description="Destination city/airport code")
-    departure_date: str = Field(..., description="Departure date")
-    adults: str = Field(..., description="Number of passengers")
-    maxPrice: str = Field(..., description="Maximum price of flight")
-    currencyCode: str = Field("USD", description="The currency code")
-    hotelPrefs: TripPreferences
-
 @tool
 def flight_search_tool(
     originLocationCode: str,

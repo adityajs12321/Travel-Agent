@@ -1,3 +1,6 @@
-lmfao = ["w223r2", "ergrwg", "g34g"]
-lmfao[1:] = []
-print(lmfao)
+from typing import Any
+
+def lmfao(name: str, arguments: dict[str, Any]):
+    print(name, arguments["tendiman"])
+
+lmfao("aduman", {"aduman": "pro", "tendiman": "noob"})

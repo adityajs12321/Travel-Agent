@@ -1,6 +1,7 @@
 import json
 from typing import Union
 from pathlib import Path
+from fastmcp import FastMCP, Client
 
 from colorama import Fore
 
@@ -130,15 +131,19 @@ class ReactAgent:
     def __init__(
         self,
         tools: Union[Tool, list[Tool]],
+        mcp_client: Client,
         client,
+        amadeus_client,
         system_prompt: str = BASE_SYSTEM_PROMPT,
-        add_constraints: bool = True
+        add_constraints: bool = True,
     ) -> None:
         self.client = client
         self.system_prompt = system_prompt
         self.tools = tools if isinstance(tools, list) else [tools]
+        self.mcp_client = mcp_client
         self.tools_dict = {tool.name: tool for tool in self.tools}
         self.add_constraints = add_constraints
+        self.amadeus_client = amadeus_client
 
     def add_tool_signatures(self) -> str:
         """
@@ -148,6 +153,16 @@ class ReactAgent:
             str: A concatenated string of all tool function signatures in JSON format.
         """
         return "".join([tool.fn_signature for tool in self.tools])
+    
+    async def add_mcp_tools_signatures(self) -> str:
+        async with self.mcp_client:
+            tools = await self.mcp_client.list_tools()
+            required_fields = ["name", "description", "inputSchema"]
+            altered_tools = [tool.model_dump() for tool in tools]
+            altered_tools2 = []
+            for tool in altered_tools:
+                altered_tools2.append({key: tool.get(key) for key in required_fields})
+            return "".join([json.dumps(tool) for tool in altered_tools2])
 
     def process_tool_calls(self, tool_calls_content: list) -> dict:
         """
@@ -180,8 +195,25 @@ class ReactAgent:
             observations[validated_tool_call["id"]] = result
 
         return observations
+    
+    async def mcp_tool_calls(self, tool_calls_content: list) -> dict:
+        async with self.mcp_client:
+            i = 0
+            observations = {}
 
-    def run(
+            for tool_call_str in tool_calls_content:
+                tool = json.loads(tool_call_str)
+                tool_name = tool["name"]
+                tool_args = tool["arguments"]
+                tool_args["client"] = self.amadeus_client
+
+                tool_result = await self.mcp_client.call_tool(name=tool_name, arguments=tool_args)
+                observations[i] = tool_result
+            
+            return observations
+
+
+    async def run(
         self,
         conversation_id: str,
         messages: dict,
@@ -208,7 +240,7 @@ class ReactAgent:
         global additional_constraints
         if self.tools:
             self.system_prompt += (
-                "\n" + REACT_SYSTEM_PROMPT % self.add_tool_signatures() + (additional_constraints if self.add_constraints else "")
+                "\n" + REACT_SYSTEM_PROMPT % await self.add_mcp_tools_signatures() + (additional_constraints if self.add_constraints else "")
             )
 
 
@@ -249,7 +281,7 @@ class ReactAgent:
                 if (thought.found): print(Fore.MAGENTA + f"\nThought: {thought.content[0]}")
 
                 if tool_calls.found:
-                    observations = self.process_tool_calls(tool_calls.content)
+                    observations = await self.mcp_tool_calls(tool_calls.content)
                     print(Fore.BLUE + f"\nObservations: {observations}")
                     update_chat_history(messages[conversation_id], f"{observations}", "user")
                     # chat_history_ids[conversation_id].append(user_prompt)

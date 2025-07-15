@@ -2,7 +2,8 @@ import sys
 import os
 import json
 from pydantic import BaseModel, Field
-import copy
+from fastmcp import Client
+import asyncio
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -12,6 +13,7 @@ from agentic_patterns.tool_pattern.tool import tool
 from RAG.rag import RAG
 from Agents.RouterAgent import Context
 from Utils.utils import save_chat_history
+from agentic_patterns.utils.completions import ChatHistory
 
 model = ModelAdapter(client_name="ollama", model="gemma3:4b", api_key="null")
 
@@ -101,11 +103,14 @@ If the user asks for something unrelated to your task, SAY THAT YOU ARE STRICTLY
 
 temp_messages = [{"role": "system", "content": TEMP_SYSTEM_PROMPT}]
 
+mcp_client = Client("http://127.0.0.1:8000/mcp")
+
 class TravelAgent:
-    def __init__(self, model: ModelAdapter = model):
+    def __init__(self, amadeus_client, model: ModelAdapter = model):
+        self.amadeus_client = amadeus_client
         self.model = model
 
-    def response(self, context: Context):
+    async def response(self, context: Context):
         global temp_messages
         temp_messages.append({"role": "user", "content": f"Current agent context: {context.agent_context}"})
         temp_messages.append(context.history[context.conversation_id][-1])
@@ -125,15 +130,20 @@ class TravelAgent:
         _messages = context.history
         # index = len(_messages[context.conversation_id])
         _messages[context.conversation_id] = [_messages[context.conversation_id][-1]] + [{"role": "user", "content": f"Agent Context: {context.agent_context}"}]
-        react_agent = ReactAgent(tools_list, self.model, system_prompt=SYSTEM_PROMPT if self.model.client_name == "gemini" else SYSTEM_PROMPT_GEMMA, add_constraints=self.model.add_constraints)
-        response = react_agent.run(
+        
+        global mcp_client
+
+        react_agent = ReactAgent(tools=tools_list, amadeus_client=self.amadeus_client, client=self.model, system_prompt=SYSTEM_PROMPT if self.model.client_name == "gemini" else SYSTEM_PROMPT_GEMMA, add_constraints=self.model.add_constraints, mcp_client=mcp_client)
+        
+        response = await react_agent.run(
             conversation_id=context.conversation_id,
             messages=_messages,
             max_rounds=2,
             save_file=False
         )
-        # del _messages[context.conversation_id][index]
+                # del _messages[context.conversation_id][index]
         context.history[context.conversation_id].append({"role": "assistant", "content": response})
+            # context.history[context.conversation_id] = ChatHistory(context.history[context.conversation_id])
         save_chat_history(context.history)
         context.agent_context = {}
         temp_messages[1:] = []

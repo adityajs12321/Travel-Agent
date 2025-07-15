@@ -12,6 +12,7 @@ from Agents.RouterAgent import Context
 import copy
 from Utils.utils import save_chat_history
 from agentic_patterns.utils.completions import build_prompt_structure
+from fastmcp import Client
 
 model = ModelAdapter(client_name="ollama", model="gemma3:4b", api_key="null")
 
@@ -67,12 +68,15 @@ tools_list = [flight_policies_tool]
 
 # temp_messages = [{"role": "system", "content": "You are required to extract the origin and destination airport code from the user input. Fill the missing values with 'NULL'"}]
 
+mcp_client = Client("http://localhost:8001/mcp")
+
 class FlightPolicyAgent:
     def __init__(self, model: ModelAdapter = model):
         self.model = model
 
-    def response(self, context: Context):
-        react_agent = ReactAgent(tools_list, self.model, system_prompt=SYSTEM_PROMPT, add_constraints=self.model.add_constraints)
+    async def response(self, context: Context):
+        global mcp_client
+        react_agent = ReactAgent(tools=tools_list, client=self.model, system_prompt=SYSTEM_PROMPT, add_constraints=self.model.add_constraints, mcp_client=mcp_client)
         _messages = copy.deepcopy(context.history)
         _messages[context.conversation_id] = load_context(context)
 
@@ -81,7 +85,7 @@ class FlightPolicyAgent:
         )
         context.history[context.conversation_id][-1] = user_prompt
 
-        response = react_agent.run(
+        response = await react_agent.run(
             conversation_id=context.conversation_id,
             messages=_messages,
             max_rounds=10

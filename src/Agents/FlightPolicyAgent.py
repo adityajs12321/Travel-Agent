@@ -85,7 +85,7 @@ class FlightPolicyAgent:
         )
         context.history[context.conversation_id][-1] = user_prompt
 
-        response = await react_agent.run(
+        response, context.agent_context = await react_agent.run(
             conversation_id=context.conversation_id,
             messages=_messages,
             max_rounds=10

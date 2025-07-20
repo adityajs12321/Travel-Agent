@@ -57,10 +57,6 @@ You will be called again with this:
 You then output:
 
 <response>The current temperature in Madrid is 25 degrees Celsius</response>
-
-Additional constraints:
-
-- If the user asks you something unrelated to any of the tools above, say that you are strictly a travel agent and you can't help with that.
 """
 
 additional_constraints = "- You can answer greet and info responses, like 'Hello, how can I help you today?' or 'I'm here to help you with your travel plans."
@@ -133,9 +129,9 @@ class ReactAgent:
         tools: Union[Tool, list[Tool]],
         mcp_client: Client,
         client,
-        amadeus_client,
         system_prompt: str = BASE_SYSTEM_PROMPT,
         add_constraints: bool = True,
+        excluded_tools: list = []
     ) -> None:
         self.client = client
         self.system_prompt = system_prompt
@@ -143,7 +139,7 @@ class ReactAgent:
         self.mcp_client = mcp_client
         self.tools_dict = {tool.name: tool for tool in self.tools}
         self.add_constraints = add_constraints
-        self.amadeus_client = amadeus_client
+        self.excluded_tools = excluded_tools
 
     def add_tool_signatures(self) -> str:
         """
@@ -162,7 +158,7 @@ class ReactAgent:
             altered_tools2 = []
             for tool in altered_tools:
                 altered_tools2.append({key: tool.get(key) for key in required_fields})
-            return "".join([json.dumps(tool) for tool in altered_tools2])
+            return "".join([json.dumps(tool) for tool in altered_tools2 if tool.get("name") not in self.excluded_tools])
 
     def process_tool_calls(self, tool_calls_content: list) -> dict:
         """
@@ -200,17 +196,19 @@ class ReactAgent:
         async with self.mcp_client:
             i = 0
             observations = {}
+            agent_context = {}
 
             for tool_call_str in tool_calls_content:
                 tool = json.loads(tool_call_str)
                 tool_name = tool["name"]
                 tool_args = tool["arguments"]
-                tool_args["client"] = self.amadeus_client
-
+                print(f"\n\nTOOL ARGS: {tool_args}")
                 tool_result = await self.mcp_client.call_tool(name=tool_name, arguments=tool_args)
-                observations[i] = tool_result
+                print(f"\n\n TOOL RESULT: {tool_result}\n\n")
+                agent_context = json.loads(tool_result.content[0].text)["agent_context"]
+                observations[i] = json.loads(tool_result.content[0].text)["tool_results"]
             
-            return observations
+            return observations, agent_context
 
 
     async def run(
@@ -219,7 +217,8 @@ class ReactAgent:
         messages: dict,
         max_rounds: int = 10,
         summarise: bool = False,
-        save_file: bool = True
+        save_file: bool = True,
+        agent_context: dict = {}
     ) -> str:
         """
         Executes a user interaction session, where the agent processes user input, generates responses,
@@ -245,7 +244,7 @@ class ReactAgent:
 
 
         messages[conversation_id] = [build_prompt_structure(prompt=self.system_prompt, role="system")] + messages[conversation_id]
-        messages[conversation_id][-1] = user_prompt
+        # messages[conversation_id][-1] = user_prompt
 
         # Summarising the context
 
@@ -259,8 +258,10 @@ class ReactAgent:
                 summarised_context = completions_create(self.client, summarisation_messages)
                 messages[conversation_id][1:-1] = [{"role": "assistant", "content": summarised_context}]
 
+
         if self.tools:
             # Run the ReAct loop for max_rounds
+            agent_context = {}
             for _ in range(max_rounds):
 
                 completion = completions_create(self.client, messages[conversation_id])
@@ -270,7 +271,7 @@ class ReactAgent:
                     messages[conversation_id] = messages[conversation_id][1:]
                     messages[conversation_id] = ChatHistory(messages[conversation_id])
                     if (save_file): save_chat_history(messages)
-                    return response.content[0]
+                    return response.content[0], agent_context
 
                 thought = extract_tag_content(str(completion), "thought")
                 tool_calls = extract_tag_content(str(completion), "tool_call")
@@ -281,7 +282,8 @@ class ReactAgent:
                 if (thought.found): print(Fore.MAGENTA + f"\nThought: {thought.content[0]}")
 
                 if tool_calls.found:
-                    observations = await self.mcp_tool_calls(tool_calls.content)
+                    observations, agent_context = await self.mcp_tool_calls(tool_calls.content)
+                    # tool_calls_results.append(tool_call_results)
                     print(Fore.BLUE + f"\nObservations: {observations}")
                     update_chat_history(messages[conversation_id], f"{observations}", "user")
                     # chat_history_ids[conversation_id].append(user_prompt)
@@ -289,10 +291,14 @@ class ReactAgent:
                     messages[conversation_id] = messages[conversation_id][1:]
                     messages[conversation_id] = ChatHistory(messages[conversation_id])
                     if (save_file): save_chat_history(messages)
-                    return messages[conversation_id][-1]["content"]
+                    return messages[conversation_id][-1]["content"], agent_context
 
         # Save chat history after each interaction
+        _response =  completions_create(self.client, messages[conversation_id])
+        _response = extract_tag_content(str(_response), "response")
         messages[conversation_id] = messages[conversation_id][1:]
         messages[conversation_id] = ChatHistory(messages[conversation_id])
         if (save_file): save_chat_history(messages)
-        return completions_create(self.client, messages[conversation_id])
+        if (_response.found):
+            return _response.content[0], agent_context
+        return _response, agent_context

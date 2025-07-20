@@ -1,6 +1,7 @@
-from typing import Any
+# lmfao = {"origin": "eded", "destination": "efwef", "date": "eded"}
 
-def lmfao(name: str, arguments: dict[str, Any]):
-    print(name, arguments["tendiman"])
+# print([k for k,v in lmfao.items() if v == "NULL"])
 
-lmfao("aduman", {"aduman": "pro", "tendiman": "noob"})
+lmfao = ["fesff", "niviman", "adu"]
+
+print("wef" in lmfao)

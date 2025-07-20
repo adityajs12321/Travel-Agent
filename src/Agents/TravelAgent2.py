@@ -3,7 +3,6 @@ import os
 import json
 from pydantic import BaseModel, Field
 from fastmcp import Client
-import asyncio
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -12,7 +11,7 @@ from agentic_patterns.planning_pattern.react_agent_v2 import ReactAgent
 from agentic_patterns.tool_pattern.tool import tool
 from RAG.rag import RAG
 from Agents.RouterAgent import Context
-from RAG.dynamic_context import load_flight_context
+from RAG.dynamic_context import load_flight_context2
 from Utils.utils import save_chat_history
 from agentic_patterns.utils.completions import ChatHistory
 
@@ -34,14 +33,12 @@ If either origin or destination is mentioned, use the context to figure out the 
 """
 
 SYSTEM_PROMPT = """
-You are a travel agent that takes in agent context and calls flight_search_tool by filling it with the agent context. LIST ALL THE FLIGHT OPTIONS.
-YOU CAN ONLY SUGGEST NOT BOOK FLIGHTS.
+You are a travel agent that can ONLY SUGGEST NOT BOOK FLIGHTS.
 
-If the user books a new flight, just look it up using flight_search_tool and don' do anything stupid.
-If flight list is already provided, refer to that for further questions, no need to call any tool.
+If the user asks for booking a new flight, just look it up using flight_search_tool, EVEN IF ALL THE PARAMETERS AREN' MET.
 
-If either origin or destination is mentioned, use the context to figure out the most likely value.
-DO NOT RESPOND IN JSON UNLESS ASKED TO.
+If the user asks for a specific flight, use the choose_flight tool and return a natural language response describing the chosen flight.
+ONLY CALL ONE TOOL AT A TIME.
 """
 
 SYSTEM_PROMPT_NEW_REQUEST = """
@@ -133,7 +130,7 @@ tools_list = [flight_search_tool]
 
 TEMP_SYSTEM_PROMPT = """
 You are required to extract the origin and destination airport code from the user input. Fill the missing values with 'NULL'. 
-
+Departure date should be in YYYY-MM-DD format
 If the user asks for something unrelated to your task, SAY THAT YOU ARE STRICTLY A TRAVEL AGENT AND CANNOT HELP WITH THAT.
 """
 
@@ -146,38 +143,12 @@ flights_list = []
 chosen_flight = {}
 
 class TravelAgent:
-    def __init__(self, amadeus_client, model: ModelAdapter = model):
-        self.amadeus_client = amadeus_client
+    def __init__(self, model: ModelAdapter = model):
+        # self.amadeus_client = amadeus_client
         self.model = model
 
     async def response(self, context: Context):
-        global temp_messages, flights_list, chosen_flight
-
-        temp_messages_new_request = [{"role": "system", "content": SYSTEM_PROMPT_NEW_REQUEST}]
-        # temp_messages_new_request.append(context.history[context.conversation_id][-2])
-        temp_messages_new_request.append(context.history[context.conversation_id][-1])
-        print(f"\n\ntemp messages: {temp_messages_new_request}\n\n")
-        response = self.model.response(temp_messages_new_request, NewRequest)
-        new_request = NewRequest.model_validate_json(response).new_request
-        print("\nflight agent response", new_request, "\n")
-        # if (new_request == 1):
-        #     print("")
-        # elif (new_request == 2):
-        #     messages, flights_list = load_flight_context(SYSTEM_PROMPT_EXISTING_REQUEST, context)
-        #     print(f"\n\n MESSAGES: {messages}")
-        #     if (flights_list == []): return "Please search for available flights so I can filter accordingly"
-        #     response = self.model.response(messages, ChooseFlight)
-        #     response = ChooseFlight.model_validate_json(response)
-        #     flight_id = response.flight_id
-            
-        #     chosen_flight = list(filter(lambda flight: flight['id'] == str(flight_id), flights_list))[0]
-        #     context.history[context.conversation_id].append({"role": "user", "content": json.dumps({'CHOSEN FLIGHT DETAILS': chosen_flight})})
-        #     print(f"\n\nFlight list:\n {flights_list}")
-        #     print(f"\n\nChosen flight:\n {chosen_flight}")
-        #     context.history[context.conversation_id] = ChatHistory(context.history[context.conversation_id])
-        #     save_chat_history(context.history)
-        #     return response.flight_details
-            
+        global temp_messages, flights_list, chosen_flight, mcp_client
 
         # temp_messages.append({"role": "user", "content": f"Current agent context: {context.agent_context}"})
         # temp_messages.append(context.history[context.conversation_id][-1])
@@ -192,29 +163,42 @@ class TravelAgent:
         #     temp_messages.append({"role": "user", "content": f"{",".join(null_keys)} is missing, give response in a single sentence asking user to fill it. Don't mention the extracted information"})
         #     response = self.model.response(temp_messages)
         #     temp_messages.append({"role": "assistant", "content": response})
+        #     print(f"\n\n temp messages: {temp_messages}")
+        #     temp_messages[1:] = []
         #     return response
-        
-        
-        # _messages = context.history
-        # # index = len(_messages[context.conversation_id])
-        # _messages[context.conversation_id] = [_messages[context.conversation_id][-1]] + [{"role": "user", "content": f"Agent Context: {context.agent_context}"}]
-        
-        # global mcp_client
 
+        # for key in context.agent_context.keys():
+        #     if (context.agent_context[key] == "NULL"):
+        #         temp_messages.append({"role": "user", "content": f"{key} is missing, give response in a single sentence asking user to fill it. Don't mention the extracted information"})
+        #         response = self.model.response(temp_messages)
+        #         temp_messages.append({"role": "assistant", "content": response})
+        #         return response
         
-        # react_agent = ReactAgent(tools=tools_list, client=self.model, system_prompt=SYSTEM_PROMPT if self.model.client_name == "gemini" else SYSTEM_PROMPT_GEMMA, add_constraints=self.model.add_constraints, mcp_client=mcp_client)
+        _messages = context.history
+        _messages[context.conversation_id], flights_list = load_flight_context2(context)
+        async with mcp_client:
+            await mcp_client.call_tool("set_flights_list", {"_flights_list": flights_list})
+        # index = len(_messages[context.conversation_id])
+        _messages[context.conversation_id].append({"role": "user", "content": f"Agent Context: {context.agent_context}"})
+
+        react_agent = ReactAgent(tools=tools_list, client=self.model, system_prompt=SYSTEM_PROMPT if self.model.client_name == "gemini" else SYSTEM_PROMPT_GEMMA, add_constraints=self.model.add_constraints, mcp_client=mcp_client, excluded_tools=["set_flights_list"])
             
-        # response = await react_agent.run(
-        #     conversation_id=context.conversation_id,
-        #     messages=_messages,
-        #     max_rounds=2,
-        #     save_file=False
-        # )
-        # # flights_list = tool_call_result[0]
-        # context.agent_context = {}
-        # temp_messages[1:] = []
+        response, context.agent_context = await react_agent.run(
+            conversation_id=context.conversation_id,
+            messages=_messages,
+            max_rounds=2,
+            save_file=False
+        )
 
-        # context.history[context.conversation_id].append({"role": "assistant", "content": response})
-        # context.history[context.conversation_id] = ChatHistory(context.history[context.conversation_id])
-        # save_chat_history(context.history)
+        # async with mcp_client:
+        #     await mcp_client.call_tool("set_flights_list", {"_flights_list": flights_list})
+        # flights_list = tool_call_result[0]
+        # context.agent_context = {}
+        temp_messages[1:] = []
+
+        print(f"\n\nExample response: {response}")
+
+        context.history[context.conversation_id].append({"role": "assistant", "content": response})
+        context.history[context.conversation_id] = ChatHistory(context.history[context.conversation_id])
+        save_chat_history(context.history)
         return response

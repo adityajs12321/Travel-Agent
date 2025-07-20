@@ -26,7 +26,7 @@ class GreetingAgent:
     def __init__(self, model: ModelAdapter = model):
         self.model = model
 
-    def response(self, context: Context):
+    async def response(self, context: Context):
         global SYSTEM_PROMPT
         current_messages = context.history[context.conversation_id]
         current_messages = [{"role": "system", "content": SYSTEM_PROMPT}] + current_messages

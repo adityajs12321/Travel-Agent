@@ -7,6 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from Models.model_config import ModelAdapter
 from Utils.utils import load_chat_history
 from agentic_patterns.utils.completions import ChatHistory
+from agentic_patterns.utils.completions import build_prompt_structure
 
 
 class ResponseFormat(BaseModel):
@@ -59,11 +60,11 @@ You will be given a list of agents in the following format:
     },
     {1: {
         "name": "travel_agent",
-        "description": "ONLY handles booking flights. Works with origin and destination city names (e.g., Chennai, Bangalore, Mumbai)".
+        "description": "ONLY handles booking flights and flight specific details. Works with origin and destination city names (e.g., Chennai, Bangalore, Mumbai)". Also suggest best flights given flights list. (e.g., what are the details of flight 1234)
     },
     {2: {
         "name": "flight_details_agent",
-        "description": "Handles details and policies of a chosen flight (e.g., baggage, in-flight meals, check-in, refund process, services)."
+        "description": "Handles policies of a chosen flight (e.g., baggage, in-flight meals, check-in, refund process, services)."
     },
     {3: {
         "name": "restaurant_agent",
@@ -103,14 +104,17 @@ class RouterAgent:
         self.context = Context(conversation_id)
 
     def response(self, message: str) -> str:
+        user_prompt = build_prompt_structure(
+            prompt=message, role="user", tag="question"
+        )
         if (self.context.history.get(self.context.conversation_id) == None):
             chat_history = ChatHistory(
                 [
-                    {"role": "user", "content": message}
+                    user_prompt
                 ]
             )
             self.context.history[self.context.conversation_id] = chat_history
-        else: self.context.history[self.context.conversation_id].append({"role": "user", "content": message})
+        else: self.context.history[self.context.conversation_id].append(user_prompt)
 
         global SYSTEM_PROMPT
         messages = [{"role": "system", "content": SYSTEM_PROMPT}]
@@ -119,7 +123,7 @@ class RouterAgent:
         if (len(self.context.history[self.context.conversation_id]) >= 2):
             if (self.context.history[self.context.conversation_id][-2]["role"] == "assistant"): temp_list.append(self.context.history[self.context.conversation_id][-2])
         while (i <= len(self.context.history[self.context.conversation_id])):
-            if (self.context.history[self.context.conversation_id][-i]['content'][:10] == "<question>"):
+            if (self.context.history[self.context.conversation_id][-i]['content'][:10] == "<question>" and self.context.history[self.context.conversation_id][-i]['content'][:15] != "<question>Agent"):
                 count += 1
                 temp_list.append(self.context.history[self.context.conversation_id][-i])
             i += 1

@@ -7,7 +7,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from Agents.RouterAgent import RouterAgent
 from Agents.GreetingAgent import GreetingAgent
-from Agents.TravelAgent import TravelAgent
+# from Agents.TravelAgent import TravelAgent
+from Agents.TravelAgent2 import TravelAgent
 from Agents.FlightPolicyAgent import FlightPolicyAgent
 from Agents.RestaurantAgent import RestaurantAgent
 from Agents.ActivitiesAgent import ActivitiesAgent
@@ -21,14 +22,13 @@ import asyncio
 # last_conv_id = list(temp_chat_history.keys())[-1]
 
 # conversation_id = int(last_conv_id) + 1
-conversation_id = "0"
+conversation_id = "21"
 
-amadeus_client = AmadeusClient(os.getenv("AMADEUS_CLIENT_ID"), os.getenv("AMADEUS_CLIENT_SECRET"))
 _client = ModelAdapter(client_name="gemini", model="gemini-2.5-flash", api_key=os.getenv("GEMINI_API_KEY"))
 
 AGENT_CONFIG = {
     0: GreetingAgent(_client),
-    1: TravelAgent(amadeus_client=amadeus_client, model=_client),
+    1: TravelAgent(_client),
     2: FlightPolicyAgent(_client),
     3: RestaurantAgent(_client),
     4: ActivitiesAgent(_client)

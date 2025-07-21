@@ -1,13 +1,16 @@
 # Intelligent Travel Agent
-LLM based travel agent that uses ReAct and Reflection pattern to devise the best travel plan, wrapped in FastAPI's interface.
+A Large Language Model (LLM)-powered travel agent that uses advanced agentic patterns (ReAct, Reflection) to suggest the best travel plans. The backend is built with FastAPI and supports both live (Amadeus API) and offline (JSON/PDF) data sources for flights, hotels, and activities.
 
 ## Features
-- Now supports alternative flight data sources (JSON files, PDFs) that can be updated with relevant information.
-- `model.py` contains support for flight and hotel suggestions using the Amadeus API, `model_v2.py` retrieves information from the .json files and PDFs.
+- Suggests flights, hotels, and activities using LLM reasoning.
+- Supports both Amadeus API and local data files (JSON, PDF).
+- Modular agentic patterns: ReAct, Reflection, Multi-agent, Tool-using.
+- FastAPI interface.
 
 ## Requirements
 - An [Amadeus self service developer account](https://developers.amadeus.com/self-service) for flight and hotel data
-- [Groq](https://groq.com) account for LLM usage (Preferably llama3.3-70B-versatile)
+- [Groq](https://groq.com) or [Gemini](https://ai.dev) account for LLM usage (Preferably llama3.3-70B-versatile)
+- Local models are also supported (Not Recommended)
 
 ## Installation
 1. Clone the repository
@@ -18,14 +21,10 @@ LLM based travel agent that uses ReAct and Reflection pattern to devise the best
 ## Example Usage
 
 ### Set your Amadeus access token and Groq API Key
-Use the `/set` POST method to define the `client_id` and `client_secret` for access to Amadeus services and the Groq api key for linking the LLM.
-
-![/set method](https://raw.githubusercontent.com/adityajs12321/Travel-Agent/refs/heads/main/src/imgs/set2.png)
+Use the `/set` endpoint to provide your Amadeus and preffered LLM API keys.
 
 ### Ask the agent for a travel plan
 Use the `/ask` POST method to set the trip details and preferences, and view the response in the response body.
-
-![/ask method](https://raw.githubusercontent.com/adityajs12321/Travel-Agent/refs/heads/main/src/imgs/ask2.png)
 
 ## LICENCE
 MIT Licence

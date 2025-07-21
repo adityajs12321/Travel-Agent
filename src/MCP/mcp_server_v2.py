@@ -28,8 +28,8 @@ flight_search_mcp = FastMCP("Flight Agent Tools")
 
 @flight_search_mcp.tool()
 def flight_search_tool(
-	originLocationCode: str = Field('NULL', description="The origin airport iataCode", examples=["BLR", "TVM"], max_length=3),
-	destinationLocationCode: str = Field('NULL', description="The destination airport iataCode", examples=["JFK", "LON"], max_length=3),
+	originLocationCode: str = Field('NUL', description="The origin airport iataCode", examples=["BLR", "TVM"], max_length=3),
+	destinationLocationCode: str = Field('NUL', description="The destination airport iataCode", examples=["JFK", "LON"], max_length=3),
 	departureDate: str = Field('NULL', description="The date of departure (In YYYY-MM-DD format)"),
 	adults: str = Field('NULL', description="The number of adults"),
 	maxPrice: str = Field('0', description="The max price the flight should cost"),
@@ -50,7 +50,7 @@ def flight_search_tool(
 	
 	print(f"\n\nAgent Context: {agent_context}")
 	
-	null_keys = [k for k,v in agent_context.items() if v == "NULL"]
+	null_keys = [k for k,v in agent_context.items() if (v == "NULL" or v == "NUL")]
 
 	if (null_keys != []):
 		if (agent_context["maxPrice"] == '0'): null_keys.append("maxPrice")

@@ -29,21 +29,44 @@ def load_flight_context(system_prompt: str, context: Context):
     tokenized_corpus = [doc.split(" ") for doc in bm25_corpus]
     bm25 = BM25Okapi(tokenized_corpus)
 
-    results = bm25_search(bm25, bm25_corpus, "'FLIGHT DETAILS LISTED'")
+    results = {}
+    for doc in context.history[context.conversation_id][::-1]:
+        if (doc["content"][:27] == "{0: {'FLIGHT DETAILS LISTED"):
+            results = doc
+            break
+
+    
+    # results = bm25_search(bm25, bm25_corpus, "'FLIGHT DETAILS LISTED'")
 
     flights_list = None
-    if ("FLIGHT DETAILS LISTED" in list(results.keys())[0]):
-        _message = json.loads(list(results.keys())[0])
-        string = _message["content"]
+    # if ("FLIGHT DETAILS LISTED" in list(results.keys())[0]):
+    #     _message = json.loads(list(results.keys())[0])
+        # string = _message["content"]
+        # json_data = ast.literal_eval(string)
+        # flights_list = ast.literal_eval(json_data[0])["FLIGHT DETAILS LISTED"]
+        # print(f"\n\n Flgiht details: {flights_list}")
+        # messages.append(_message)
+
+    if (results != {}):
+        string = results["content"]
         json_data = ast.literal_eval(string)
         flights_list = ast.literal_eval(json_data[0])["FLIGHT DETAILS LISTED"]
         print(f"\n\n Flgiht details: {flights_list}")
-        messages.append(_message)
+        messages.append(results)
 
-    results = bm25_search(bm25, bm25_corpus, "'CHOSEN FLIGHT DETAILS'")
+    # results = bm25_search(bm25, bm25_corpus, "'CHOSEN FLIGHT DETAILS'")
 
-    if ("CHOSEN FLIGHT DETAILS" in list(results.keys())[0]):
-        messages.append(json.loads(list(results.keys())[0]))
+    # if ("CHOSEN FLIGHT DETAILS" in list(results.keys())[0]):
+    #     messages.append(json.loads(list(results.keys())[0]))
+
+    results = {}
+    for doc in context.history[context.conversation_id][::-1]:
+        if (doc["content"][:27] == "{0: {'CHOSEN FLIGHT DETAILS"):
+            results = doc
+            break
+    
+    if (results != {}):
+        messages.append(results)
 
     i, count = 2, 1
     temp_list = [context.history[context.conversation_id][-1]]
@@ -64,22 +87,43 @@ def load_flight_context2(context: Context):
     tokenized_corpus = [doc.split(" ") for doc in bm25_corpus]
     bm25 = BM25Okapi(tokenized_corpus)
 
-    results = bm25_search(bm25, bm25_corpus, "'FLIGHT DETAILS LISTED'")
+    results = {}
+    for doc in context.history[context.conversation_id][::-1]:
+        if (doc["content"][:27] == "{0: {'FLIGHT DETAILS LISTED"):
+            results = doc
+            break
+
+    # results = bm25_search(bm25, bm25_corpus, "'FLIGHT DETAILS LISTED'")
 
     flights_list = []
-    if ("FLIGHT DETAILS LISTED" in list(results.keys())[0]):
-        _message = json.loads(list(results.keys())[0])
-        string = _message["content"]
+    # if ("FLIGHT DETAILS LISTED" in list(results.keys())[0]):
+    #     _message = json.loads(list(results.keys())[0])
+    #     string = _message["content"]
+    #     json_data = ast.literal_eval(string)
+    #     # print(json_data[0])
+    #     flights_list = json_data[0]["FLIGHT DETAILS LISTED"]
+    #     print(f"\n\n Flgiht details: {flights_list}")
+    #     messages.append(_message)
+    if (results != {}):
+        string = results["content"]
         json_data = ast.literal_eval(string)
-        # print(json_data[0])
         flights_list = json_data[0]["FLIGHT DETAILS LISTED"]
         print(f"\n\n Flgiht details: {flights_list}")
-        messages.append(_message)
+        messages.append(results)
 
-    results = bm25_search(bm25, bm25_corpus, "'CHOSEN FLIGHT DETAILS'")
+    # results = bm25_search(bm25, bm25_corpus, "'CHOSEN FLIGHT DETAILS'")
 
-    if ("CHOSEN FLIGHT DETAILS" in list(results.keys())[0]):
-        messages.append(json.loads(list(results.keys())[0]))
+    # if ("CHOSEN FLIGHT DETAILS" in list(results.keys())[0]):
+    #     messages.append(json.loads(list(results.keys())[0]))
+
+    results = {}
+    for doc in context.history[context.conversation_id][::-1]:
+        if (doc["content"][:27] == "{0: {'CHOSEN FLIGHT DETAILS"):
+            results = doc
+            break
+    
+    if (results != {}):
+        messages.append(results)
 
     i, count = 2, 1
     temp_list = [context.history[context.conversation_id][-1]]

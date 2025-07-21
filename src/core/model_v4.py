@@ -22,7 +22,7 @@ import asyncio
 # last_conv_id = list(temp_chat_history.keys())[-1]
 
 # conversation_id = int(last_conv_id) + 1
-conversation_id = "21"
+conversation_id = "34"
 
 _client = ModelAdapter(client_name="gemini", model="gemini-2.5-flash", api_key=os.getenv("GEMINI_API_KEY"))
 

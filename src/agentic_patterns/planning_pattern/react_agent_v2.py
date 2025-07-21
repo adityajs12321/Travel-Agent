@@ -261,7 +261,6 @@ class ReactAgent:
 
         if self.tools:
             # Run the ReAct loop for max_rounds
-            agent_context = {}
             for _ in range(max_rounds):
 
                 completion = completions_create(self.client, messages[conversation_id])
@@ -282,7 +281,8 @@ class ReactAgent:
                 if (thought.found): print(Fore.MAGENTA + f"\nThought: {thought.content[0]}")
 
                 if tool_calls.found:
-                    observations, agent_context = await self.mcp_tool_calls(tool_calls.content)
+                    observations, _agent_context = await self.mcp_tool_calls(tool_calls.content)
+                    if (_agent_context != {}): agent_context = _agent_context
                     # tool_calls_results.append(tool_call_results)
                     print(Fore.BLUE + f"\nObservations: {observations}")
                     update_chat_history(messages[conversation_id], f"{observations}", "user")

@@ -3,6 +3,7 @@ import os
 import json
 from pydantic import BaseModel, Field
 from fastmcp import Client
+import copy
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -196,7 +197,9 @@ class TravelAgent:
         # context.agent_context = {}
         temp_messages[1:] = []
 
-        print(f"\n\nExample response: {response}")
+        # print(f"\n\nExample response: {response}")
+        # if (flights_list != []): context.history[context.conversation_id].append({"role": "user", "content": json.dumps({0: {"FLIGHT DETAILS LISTED": flights_list}})})
+        # if (chosen_flight != {}): context.history[context.conversation_id].append({"role": "user", "content": json.dumps({0: {"CHOSEN FLIGHT DETAILS": chosen_flight}})})
 
         context.history[context.conversation_id].append({"role": "assistant", "content": response})
         context.history[context.conversation_id] = ChatHistory(context.history[context.conversation_id])

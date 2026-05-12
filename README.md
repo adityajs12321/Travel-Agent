@@ -5,6 +5,9 @@ A Large Language Model (LLM)-powered travel agent that uses advanced agentic pat
 - Suggests flights, hotels, and activities using LLM reasoning.
 - Supports both Amadeus API and local data files (JSON, PDF).
 - Modular agentic patterns: ReAct, Reflection, Multi-agent, Tool-using.
+- **LangGraph Integration:** Orchestrates complex, stateful multi-agent workflows and reasoning sequences.
+- **RAG Pipeline:** Retrieves and injects dynamic context from local documents to enrich LLM prompts and provide accurate, policy-compliant suggestions.
+- **MCP:** Exposes application capabilities (like flight search via Amadeus API/JSON and policy search) via standard `fastmcp` servers, allowing LLM clients to seamlessly discover and execute tools using multi-processed endpoints.
 - FastAPI interface.
 
 ## Requirements

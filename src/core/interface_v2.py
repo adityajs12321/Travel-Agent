@@ -57,7 +57,7 @@ def model_type(api_keys: APIKey, client_name: str, model: str, api_key: str = ""
 
 
 @app.post("/ask")
-def trip_request(request: str, conversation_id: str = id):
+async def trip_request(request: str, conversation_id: str = id):
     """
     Handles trip planning requests.
     
@@ -79,7 +79,7 @@ def trip_request(request: str, conversation_id: str = id):
         print("\n\nInitialised router agent\n\n")
         prev_id = _conversation_id
 
-    response = trip_planning(request, client)
+    response = await trip_planning(request, client)
     return {
         "Response": response,
         "Conversation ID": _conversation_id

@@ -1,7 +1,7 @@
 # Intelligent Travel Agent
 LLM based travel agent that uses ReAct and Reflection pattern to devise the best travel plan, wrapped in FastAPI's interface.
 
-(Updated version is in the [testing](https://github.com/adityajs12321/Travel-Agent/tree/testing) branch)
+Updated version is in the [testing](https://github.com/adityajs12321/Travel-Agent/tree/testing) branch
 
 ## Features
 - Now supports alternative flight data sources (JSON files, PDFs) that can be updated with relevant information.

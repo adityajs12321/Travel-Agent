@@ -10,6 +10,15 @@ A Large Language Model (LLM)-powered travel agent that uses advanced agentic pat
 - **MCP:** Exposes application capabilities (like flight search via Amadeus API/JSON and policy search) via standard `fastmcp` servers, allowing LLM clients to seamlessly discover and execute tools using multi-processed endpoints.
 - FastAPI interface.
 
+## Supported Agents
+The project orchestrates multiple specialized sub-agents to handle different aspects of trip planning:
+- **Router Agent:** Acts as the central orchestrator, analyzing user queries and routing them to the appropriate specialized agent.
+- **Greeting Agent:** Handles generic requests and initial user interactions.
+- **Travel Agent:** Dedicated to flight searching, validation, and itinerary planning using the Amadeus API or local JSON.
+- **Flight Policy Agent:** Queries RAG pipelines to return rules and policies (e.g., baggage, cancellation policies) regarding specific flights.
+- **Restaurant Agent:** Locates and suggests dining options tailored to the destination and user preferences.
+- **Activities Agent:** Suggests local events, landmarks, and activities to build comprehensive daily schedules.
+
 ## Requirements
 - An [Amadeus self service developer account](https://developers.amadeus.com/self-service) for flight and hotel data
 - [Groq](https://groq.com) or [Gemini](https://ai.dev) account for LLM usage (Preferably llama3.3-70B-versatile)
